@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./automacao-ui.css">
+<style>
+body{margin:0;background:var(--au-bg);font-family:Figtree,system-ui,sans-serif;color:var(--au-text);-webkit-font-smoothing:antialiased}
+a{color:var(--au-accent-ink)}a:hover{color:var(--au-accent-ink-hover)}
+:focus-visible{outline:2px solid var(--au-accent-strong);outline-offset:3px}
+button:disabled{cursor:not-allowed}
+@keyframes dcspin{to{transform:rotate(360deg)}}
+</style>
+</helmet>
+<div class="au-root" data-au-theme="{{ themeAttr }}" data-au-accent="{{ accentAttr }}" style="min-height:100vh;background:var(--au-bg);color:var(--au-text);box-sizing:border-box;transition:background .25s;display:flex;align-items:flex-start">
+<nav id="au-sidebar" aria-label="Menu principal" style="position:sticky;top:0;height:100vh;flex:none;width:{{ side.w }};transition:width .25s ease;box-sizing:border-box;padding:18px 12px;display:flex;flex-direction:column;gap:16px;background:var(--au-bg);box-shadow:6px 0 16px var(--au-shadow-dark);z-index:20;overflow:hidden">
+  <div style="display:flex;align-items:center;gap:12px;min-height:48px;padding-left:4px">
+    <span aria-hidden="true" style="width:44px;height:44px;flex:none;border-radius:14px;box-shadow:var(--au-elev-1);display:flex;align-items:center;justify-content:center;font:800 15px Figtree,sans-serif;color:var(--au-accent-ink)">PA</span>
+    <sc-if value="{{ side.open }}" hint-placeholder-val="{{ true }}"><div style="display:flex;flex-direction:column;line-height:1.15;white-space:nowrap"><span style="font-weight:800;font-size:15px;letter-spacing:.05em;color:var(--au-text-strong)">PAINEL</span><span style="font-weight:300;font-size:15px;letter-spacing:.05em;color:var(--au-text-soft)">AUTOMAÇÃO</span></div></sc-if>
+  </div>
+  <button aria-expanded="{{ side.openAria }}" aria-controls="au-nav-list" aria-label="{{ side.toggleLabel }}" title="{{ side.toggleLabel }}" onClick="{{ toggleSide }}" style="border:none;background:var(--au-bg);border-radius:12px;height:40px;padding:0 15px;box-shadow:var(--au-elev-1);display:flex;align-items:center;gap:10px;font:600 13px Figtree,sans-serif;color:var(--au-text);cursor:pointer;white-space:nowrap;flex:none">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none;transform:{{ side.chev }};transition:transform .25s"><path d="M15 6l-6 6 6 6"></path></svg>
+    <sc-if value="{{ side.open }}" hint-placeholder-val="{{ true }}"><span>Recolher menu</span></sc-if>
+  </button>
+  <ul id="au-nav-list" style="list-style:none;margin:0;padding:4px 2px;display:flex;flex-direction:column;gap:6px;flex:1;overflow-y:auto;overflow-x:hidden">
+    <sc-for list="{{ navItems }}" as="it" hint-placeholder-count="10">
+      <li><a href="{{ it.href }}" onClick="{{ it.go }}" aria-current="{{ it.current }}" title="{{ it.label }}" aria-label="{{ it.aria }}" style="position:relative;display:flex;align-items:center;gap:12px;height:44px;padding:0 14px;border-radius:12px;text-decoration:none;color:{{ it.color }};box-shadow:{{ it.shadow }};font-size:14px;font-weight:{{ it.weight }};white-space:nowrap" style-hover="color:var(--au-text-strong)">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="{{ it.icon }}"></path></svg>
+        <sc-if value="{{ it.open }}" hint-placeholder-val="{{ true }}"><span style="flex:1;overflow:hidden;text-overflow:ellipsis">{{ it.label }}</span></sc-if>
+        <sc-if value="{{ it.badgeOpen }}" hint-placeholder-val="{{ false }}"><span style="min-width:20px;height:20px;padding:0 6px;box-sizing:border-box;border-radius:10px;background:var(--au-err);color:var(--au-on-err);font:700 11px Figtree,sans-serif;display:inline-flex;align-items:center;justify-content:center">{{ it.badge }}</span></sc-if>
+        <sc-if value="{{ it.badgeDot }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:6px;left:30px;min-width:16px;height:16px;padding:0 4px;box-sizing:border-box;border-radius:8px;background:var(--au-err);color:var(--au-on-err);font:700 10px Figtree,sans-serif;display:inline-flex;align-items:center;justify-content:center">{{ it.badge }}</span></sc-if>
+      </a></li>
+    </sc-for>
+  </ul>
+  <div style="display:flex;flex-direction:column;gap:8px;padding-top:12px;border-top:1px solid var(--au-divider);flex:none">
+    <div title="{{ svcTitle }}" style="display:flex;align-items:center;gap:12px;height:34px;padding:0 19px;white-space:nowrap"><span style="{{ svc.dot }}"></span><sc-if value="{{ side.open }}" hint-placeholder-val="{{ true }}"><span style="font-size:13px;font-weight:600;color:{{ svc.fg }}">Serviço {{ svc.label }}</span></sc-if></div>
+    <button onClick="{{ cycleTheme }}" aria-label="{{ themeBtnLabel }}" title="{{ themeBtnLabel }}" style="border:none;background:transparent;border-radius:12px;height:40px;padding:0 15px;display:flex;align-items:center;gap:12px;font:600 13px Figtree,sans-serif;color:var(--au-text);cursor:pointer;white-space:nowrap" style-hover="box-shadow:var(--au-elev-1)">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex:none"><path d="{{ themeIcon }}"></path></svg>
+      <sc-if value="{{ side.open }}" hint-placeholder-val="{{ true }}"><span>{{ themeBtnText }}</span></sc-if>
+    </button>
+    <div style="display:flex;align-items:center;gap:12px;padding:6px 6px;white-space:nowrap">
+      <span aria-hidden="true" style="width:36px;height:36px;flex:none;margin-left:2px;border-radius:50%;box-shadow:var(--au-inset-sm);display:flex;align-items:center;justify-content:center;font:700 12px Figtree,sans-serif;color:var(--au-text-soft)">OP</span>
+      <sc-if value="{{ side.open }}" hint-placeholder-val="{{ true }}"><div style="display:flex;flex-direction:column;line-height:1.25"><span style="font-size:13.5px;font-weight:700;color:var(--au-text-strong)">Operador</span><span style="font-size:12px;color:var(--au-muted)">Perfil Administração</span></div></sc-if>
+    </div>
+  </div>
+</nav>
+<main id="au-main" style="flex:1;min-width:0;padding:36px 28px 80px;box-sizing:border-box">
+<div style="max-width:1320px;margin:0 auto;display:flex;flex-direction:column;gap:56px">
+
+<header id="s-top" style="display:flex;flex-direction:column;gap:28px">
+  <div style="display:flex;align-items:center;gap:28px">
+    <span style="flex:1;height:1px;background:var(--au-rule)"></span>
+    <h1 style="margin:0;font-size:46px;letter-spacing:.04em;color:var(--au-text-soft);display:flex;gap:14px;align-items:baseline;flex-wrap:wrap;justify-content:center"><span style="font-weight:800">PAINEL</span><span style="font-weight:300">AUTOMAÇÃO</span></h1>
+    <span style="flex:1;height:1px;background:var(--au-rule)"></span>
+  </div>
+  <p style="margin:0 auto;max-width:720px;text-align:center;font-size:15px;line-height:1.55;color:var(--au-muted);text-wrap:pretty">Suite de elementos reutilizáveis para controle de iluminação, climatização, cortinas e sensores. Cada controle só é habilitado quando a função e os valores aceitos pelo equipamento estão confirmados. Os códigos R01–R30 indicam o requisito atendido.</p>
+  <div role="status" aria-live="polite" style="display:flex;flex-wrap:wrap;align-items:center;gap:14px 22px;padding:16px 22px;border-radius:20px;background:var(--au-bg);box-shadow:6px 6px 14px var(--au-shadow-dark),-6px -6px 14px var(--au-shadow-light)">
+    <span style="font:600 11px 'JetBrains Mono',monospace;color:var(--au-accent-ink);padding:3px 8px;border-radius:999px;box-shadow:inset 2px 2px 4px var(--au-shadow-dark),inset -2px -2px 4px var(--au-shadow-light)">R29</span>
+    <span style="display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:14px;color:{{ svc.fg }}"><span style="{{ svc.dot }}"></span>Serviço local · {{ svc.label }}</span>
+    <span style="font-size:13.5px;color:var(--au-muted)">Última atualização <span style="font-family:'JetBrains Mono',monospace;color:var(--au-text)">{{ lastUpdate }}</span></span>
+    <span style="font-size:13.5px;color:var(--au-muted)">Operações em andamento <span style="font-family:'JetBrains Mono',monospace;color:var(--au-text)">{{ ops }}</span></span>
+    <span style="flex:1"></span>
+    <span style="font:600 11px 'JetBrains Mono',monospace;color:var(--au-accent-ink);padding:3px 8px;border-radius:999px;box-shadow:inset 2px 2px 4px var(--au-shadow-dark),inset -2px -2px 4px var(--au-shadow-light)">R30</span>
+    <span style="display:inline-flex;align-items:center;gap:8px;font-size:13.5px;font-weight:600;color:var(--au-info-ink)"><span style="width:10px;height:10px;border-radius:2px;border:2px dashed var(--au-info);box-sizing:border-box"></span>Modo demonstração · dispositivos simulados</span>
+    <div role="radiogroup" aria-label="Tema de cores" style="display:flex;gap:6px"><sc-for list="{{ themeOpts }}" as="t" hint-placeholder-count="3"><button role="radio" aria-checked="{{ t.aria }}" onClick="{{ t.pick }}" style="border:none;background:var(--au-bg);border-radius:10px;padding:8px 12px;box-shadow:{{ t.shadow }};font-family:Figtree,sans-serif;font-size:12.5px;font-weight:{{ t.weight }};color:{{ t.color }};cursor:pointer">{{ t.label }}</button></sc-for></div>
+    <a href="Guia de Componentes.dc.html" style="font-size:13px;font-weight:600">Guia de componentes</a>
+    <button onClick="{{ toggleService }}" style="border:none;background:var(--au-bg);border-radius:12px;padding:9px 14px;box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:600 13px Figtree,sans-serif;color:var(--au-text);cursor:pointer">{{ svcBtn }}</button>
+  </div>
+  <sc-if value="{{ off }}" hint-placeholder-val="{{ false }}">
+    <div role="alert" style="padding:14px 20px;border-radius:16px;box-shadow:inset 3px 3px 6px var(--au-shadow-dark),inset -3px -3px 6px var(--au-shadow-light);font-size:14.5px;font-weight:600;color:var(--au-err-ink);display:flex;gap:10px;align-items:center"><span style="width:10px;height:10px;border-radius:50%;border:2px solid var(--au-err);box-sizing:border-box"></span>Serviço local desconectado. Todos os comandos estão desabilitados e os estados exibidos são os últimos conhecidos.</div>
+  </sc-if>
+</header>
+
+<section id="s-fund" style="display:flex;flex-direction:column;gap:20px;scroll-margin-top:16px">
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap"><span style="font:600 13px 'JetBrains Mono',monospace;color:var(--au-accent-ink)">01</span><h2 style="margin:0;font-size:24px;font-weight:700;color:var(--au-text-strong)">Fundamentos</h2><span style="font-size:14px;color:var(--au-muted)">Estados, controles base e acessibilidade · R02 · R07 · R28</span></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,380px),1fr));gap:26px">
+
+    <div style="background:var(--au-bg);border-radius:22px;padding:22px;box-shadow:8px 8px 18px var(--au-shadow-dark),-8px -8px 18px var(--au-shadow-light);display:flex;flex-direction:column;gap:16px;min-width:0">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><h3 style="margin:0;font-size:16px;font-weight:700">Indicadores de comunicação</h3><span style="font:600 11px 'JetBrains Mono',monospace;color:var(--au-accent-ink);padding:3px 8px;border-radius:999px;box-shadow:inset 2px 2px 4px var(--au-shadow-dark),inset -2px -2px 4px var(--au-shadow-light)">R07</span></div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px">
+        <sc-for list="{{ commStates }}" as="s" hint-placeholder-count="6">
+          <span style="display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:999px;box-shadow:inset 2px 2px 4px var(--au-shadow-dark),inset -2px -2px 4px var(--au-shadow-light);font-size:13px;font-weight:600;color:{{ s.fg }}"><span style="{{ s.dot }}"></span>{{ s.label }}</span>
+        </sc-for>
+      </div>
+      <h3 style="margin:6px 0 0;font-size:16px;font-weight:700">Estados de comando</h3>
+      <div style="display:flex;flex-wrap:wrap;gap:10px">
+        <sc-for list="{{ cmdStates }}" as="s" hint-placeholder-count="4">
+          <span style="display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:999px;box-shadow:inset 2px 2px 4px var(--au-shadow-dark),inset -2px -2px 4px var(--au-shadow-light);font-size:13px;font-weight:600;color:{{ s.fg }}"><span style="{{ s.dot }}"></span>{{ s.label }}</span>
+        </sc-for>
+      </div>
+      <p style="margin:0;font-size:13px;line-height:1.5;color:var(--au-muted)">Cada estado combina forma, texto e cor. “Desatualizado” é aplicado quando a última leitura excede o intervalo esperado do equipamento.</p>
+    </div>
+
+    <div style="background:var(--au-bg);border-radius:22px;padding:22px;box-shadow:8px 8px 18px var(--au-shadow-dark),-8px -8px 18px var(--au-shadow-light);display:flex;flex-direction:column;gap:18px;min-width:0">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><h3 style="margin:0;font-size:16px;font-weight:700">Controles base</h3><span style="font:600 11px 'JetBrains Mono',monospace;color:var(--au-accent-ink);padding:3px 8px;border-radius:999px;box-shadow:inset 2px 2px 4px var(--au-shadow-dark),inset -2px -2px 4px var(--au-shadow-light)">R28</span></div>
+      <div style="display:flex;flex-wrap:wrap;gap:18px;align-items:center">
+        <button aria-pressed="{{ basePowerAria }}" aria-label="Energia, botão de exemplo" onClick="{{ toggleBasePower }}" style="width:64px;height:64px;border-radius:50%;border:none;background:var(--au-bg);box-shadow:{{ basePowerShadow }};color:{{ basePowerColor }};cursor:pointer;display:flex;align-items:center;justify-content:center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 3v8"></path><path d="M6.3 6.8a8 8 0 1 0 11.4 0"></path></svg></button>
+        <button aria-label="Início" style="width:48px;height:48px;border-radius:14px;border:none;background:var(--au-bg);box-shadow:4px 4px 9px var(--au-shadow-dark),-4px -4px 9px var(--au-shadow-light);color:var(--au-icon);cursor:pointer;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 11l8-7 8 7v9H4z"></path></svg></button>
+        <button aria-label="Buscar" style="width:48px;height:48px;border-radius:14px;border:none;background:var(--au-bg);box-shadow:4px 4px 9px var(--au-shadow-dark),-4px -4px 9px var(--au-shadow-light);color:var(--au-icon);cursor:pointer;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6"></circle><path d="M15 15l5 5"></path></svg></button>
+        <button aria-label="Menu" style="width:48px;height:48px;border-radius:14px;border:none;background:var(--au-bg);box-shadow:4px 4px 9px var(--au-shadow-dark),-4px -4px 9px var(--au-shadow-light);color:var(--au-icon);cursor:pointer;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M5 7h14M5 12h14M5 17h14"></path></svg></button>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center">
+        <button style="border:none;background:var(--au-bg);border-radius:12px;padding:10px 18px;box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:600 14px Figtree,sans-serif;color:var(--au-text);cursor:pointer">Botão</button>
+        <button style="border:none;border-radius:12px;padding:10px 18px;background:linear-gradient(180deg,var(--au-accent-hi),var(--au-accent-lo));box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:700 14px Figtree,sans-serif;color:var(--au-on-accent);cursor:pointer">Principal</button>
+        <button style="border:none;background:var(--au-bg);border-radius:12px;padding:10px 18px;box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:600 14px Figtree,sans-serif;color:var(--au-err-ink);cursor:pointer">Ação sensível</button>
+        <button disabled="{{ true }}" style="border:none;background:var(--au-bg);border-radius:12px;padding:10px 18px;box-shadow:inset 2px 2px 4px var(--au-shadow-dark),inset -2px -2px 4px var(--au-shadow-light);font:600 14px Figtree,sans-serif;color:var(--au-faint)">Indisponível</button>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:22px;align-items:center;font-size:14px">
+        <label style="display:inline-flex;align-items:center;gap:10px;cursor:pointer"><button role="checkbox" aria-checked="{{ baseCheckAria }}" onClick="{{ toggleBaseCheck }}" style="width:26px;height:26px;border:none;border-radius:8px;background:var(--au-bg);box-shadow:inset 2px 2px 4px var(--au-shadow-dark),inset -2px -2px 4px var(--au-shadow-light);color:var(--au-accent-ink);font:800 15px Figtree;cursor:pointer;padding:0">{{ baseCheckMark }}</button>Notificar por e-mail</label>
+        <div role="radiogroup" aria-label="Exibição" style="display:flex;gap:16px">
+          <sc-for list="{{ baseRadios }}" as="r" hint-placeholder-count="2">
+            <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer"><button role="radio" aria-checked="{{ r.aria }}" onClick="{{ r.pick }}" style="width:24px;height:24px;border:none;border-radius:50%;background:var(--au-bg);box-shadow:inset 2px 2px 4px var(--au-shadow-dark),inset -2px -2px 4px var(--au-shadow-light);cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center"><span style="width:10px;height:10px;border-radius:50%;background:{{ r.dot }}"></span></button>{{ r.label }}</label>
+          </sc-for>
+        </div>
+      </div>
+      <ul style="margin:0;padding-left:18px;font-size:13px;line-height:1.6;color:var(--au-muted)">
+        <li>Todos os controles operam por teclado: Tab, Espaço/Enter, setas, Home/End.</li>
+        <li>Knobs e sliders expõem papel de slider, valor e unidade ao leitor de tela, com entrada numérica alternativa.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="s-disp" style="display:flex;flex-direction:column;gap:20px;scroll-margin-top:16px">
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap"><span style="font:600 13px 'JetBrains Mono',monospace;color:var(--au-accent-ink)">02</span><h2 style="margin:0;font-size:24px;font-weight:700;color:var(--au-text-strong)">Dispositivos e sensores</h2><span style="font-size:14px;color:var(--au-muted)">R01 · R02 · R03 · R04 · R06 · R08 · R22</span></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,380px),1fr));gap:26px;align-items:start">
+
+    <article aria-label="Módulo iluminação 3 canais" style="background:var(--au-bg);border-radius:22px;padding:22px;box-shadow:8px 8px 18px var(--au-shadow-dark),-8px -8px 18px var(--au-shadow-light);display:flex;flex-direction:column;gap:16px;min-width:0">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
+        <div style="display:flex;flex-direction:column;gap:4px;min-width:0"><h3 style="margin:0;font-size:17px;font-weight:700">Módulo iluminação 3 canais</h3><span style="font-size:13.5px;color:var(--au-muted)">Sala de reunião 1 · Interruptor · Conexão direta</span></div>
+        <div style="display:flex;gap:6px;flex:none"><span style="font:600 11px 'JetBrains Mono',monospace;color:var(--au-accent-ink);padding:3px 8px;border-radius:999px;box-shadow:inset 2px 2px 4px var(--au-shadow-dark),inset -2px -2px 4px var(--au-shadow-light)">R01–03</span></div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center"><span style="display:inline-flex;align-items:center;gap:7px;padding:5px 11px;border-radius:999px;box-shadow:inset 2px 2px 4px var(--au-shadow-dark),inset -2px -2px 4px var(--au-shadow-light);font-size:12.5px;font-weight:600;color:var(--au-ok-ink)"><span style="width:10px;height:10px;border-radius:50%;background:var(--au-ok)"></span>Conectado</span><span style="font-size:13px;color:var(--au-muted)">Última leitura <span style="font-family:'JetBrains Mono',monospace;color:var(--au-text)">{{ lastUpdate }}</span></span></div>
+      <div style="display:flex;flex-direction:column;gap:4px;padding:6px 16px;border-radius:16px;box-shadow:inset 3px 3px 6px var(--au-shadow-dark),inset -3px -3px 6px var(--au-shadow-light);opacity:{{ dimOff }}">
+        <sc-for list="{{ channels }}" as="ch" hint-placeholder-count="3">
+          <div style="display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid var(--au-divider)">
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+              <span style="font-size:15px;font-weight:600">{{ ch.name }}</span>
+              <span style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:{{ ch.st.fg }}"><span style="{{ ch.st.dot }}"></span>{{ ch.stateText }} · {{ ch.st.label }} · <span style="font-family:'JetBrains Mono',monospace;font-weight:400;color:var(--au-muted)">{{ ch.at }}</span></span>
+            </div>
+            <button role="switch" aria-checked="{{ ch.ariaOn }}" aria-label="{{ ch.aria }}" disabled="{{ ch.disabled }}" onClick="{{ ch.toggle }}" style="position:relative;width:76px;height:36px;flex:none;border:none;padding:0;border-radius:18px;background:{{ ch.trackBg }};box-shadow:{{ ch.trackShadow }};cursor:pointer;transition:background .2s"><span style="position:absolute;top:4px;left:{{ ch.knobLeft }};width:28px;height:28px;border-radius:50%;background:var(--au-thumb);box-shadow:2px 2px 5px var(--au-shadow-deep),-1px -1px 3px var(--au-shadow-light);transition:left .22s;display:flex;align-items:center;justify-content:center;gap:2px"><span style="width:3px;height:3px;border-radius:50%;background:var(--au-shadow-dark)"></span><span style="width:3px;height:3px;border-radius:50%;background:var(--au-shadow-dark)"></span><span style="width:3px;height:3px;border-radius:50%;background:var(--au-shadow-dark)"></span></span></button>
+          </div>
+        </sc-for>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+        <span style="font-size:12.5px;color:var(--au-muted);max-width:220px">O canal 3 simula retorno não confirmado.</span>
+        <button disabled="{{ allOffDisabled }}" onClick="{{ allOff }}" style="border:none;background:var(--au-bg);border-radius:12px;padding:9px 14px;box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:600 13px Figtree,sans-serif;color:var(--au-err-ink);cursor:pointer;opacity:{{ dimOff }}">Desligar todos</button>
+      </div>
+    </article>
+
+    <article aria-label="Dimmer estúdio" style="background:var(--au-bg);border-radius:22px;padding:22px;box-shadow:8px 8px 18px var(--au-shadow-dark),-8px -8px 18px var(--au-shadow-light);display:flex;flex-direction:column;gap:16px;min-width:0">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
+        <div style="display:flex;flex-direction:column;gap:4px"><h3 style="margin:0;font-size:17px;font-weight:700">Dimmer estúdio</h3><span style="font-size:13.5px;color:var(--au-muted)">Estúdio · Iluminação · Via Gateway Zigbee 01</span></div>
+        <span style="font:600 11px 'JetBrains Mono',monospace;color:var(--au-accent-ink);padding:3px 8px;border-radius:999px;box-shadow:inset 2px 2px 4px var(--au-shadow-dark),inset -2px -2px 4px var(--au-shadow-light)">R04</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:22px;flex-wrap:wrap;justify-content:center;opacity:{{ dimOff }}">
+        <div role="slider" tabIndex="0" aria-label="Brilho do dimmer estúdio" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ bright.v }}" aria-valuetext="{{ bright.text }}" onPointerDown="{{ bright.down }}" onPointerMove="{{ bright.move }}" onPointerUp="{{ bright.up }}" onKeyDown="{{ bright.key }}" style="position:relative;width:160px;height:160px;flex:none;cursor:grab;touch-action:none;border-radius:50%">
+          <svg width="160" height="160" viewBox="0 0 132 132" style="position:absolute;inset:0"><g transform="rotate(135 66 66)"><circle cx="66" cy="66" r="58" fill="none" style="stroke:var(--au-track)" stroke-width="5" stroke-linecap="round" stroke-dasharray="273.32 364.42"></circle><circle cx="66" cy="66" r="58" fill="none" style="stroke:var(--au-accent)" stroke-width="5" stroke-linecap="round" stroke-dasharray="{{ bright.arc }}"></circle></g></svg>
+          <div style="position:absolute;inset:26px;border-radius:50%;background:linear-gradient(145deg,var(--au-knob-hi),var(--au-knob-lo));box-shadow:6px 6px 14px var(--au-shadow-deep),-6px -6px 14px var(--au-shadow-light)"></div>
+          <div style="position:absolute;inset:26px;transform:{{ bright.rot }}"><span style="position:absolute;top:12px;left:50%;margin-left:-4px;width:8px;height:8px;border-radius:50%;background:var(--au-accent)"></span></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;min-width:150px">
+          <span style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--au-muted);font-weight:600">Brilho</span>
+          <span style="font-size:40px;font-weight:700;line-height:1;color:var(--au-text-strong)">{{ bright.text }}</span>
+          <sc-if value="{{ bright.adjusting }}" hint-placeholder-val="{{ false }}"><span style="font-size:12.5px;font-weight:600;color:var(--au-warn-ink)">Ajustando · envia ao soltar</span></sc-if>
+          <sc-if value="{{ bright.settled }}" hint-placeholder-val="{{ true }}"><span style="font-size:12.5px;font-weight:600;color:var(--au-ok-ink)">Valor confirmado</span></sc-if>
+          <span style="font-size:12.5px;color:var(--au-muted)">Limites {{ bright.minText }} – {{ bright.maxText }}</span>
+          <div style="display:flex;gap:10px;margin-top:4px">
+            <button aria-label="Diminuir brilho 5%" disabled="{{ off }}" onClick="{{ brightDown }}" style="width:40px;height:40px;border:none;border-radius:12px;background:var(--au-bg);box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:700 18px Figtree;color:var(--au-text);cursor:pointer">−</button>
+            <button aria-label="Aumentar brilho 5%" disabled="{{ off }}" onClick="{{ brightUp }}" style="width:40px;height:40px;border:none;border-radius:12px;background:var(--au-bg);box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:700 18px Figtree;color:var(--au-text);cursor:pointer">+</button>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:12.5px;color:var(--au-muted);padding-top:10px;border-top:1px solid var(--au-divider)"><span>{{ bright.sentText }}</span><span>Comandos enviados: <span style="font-family:'JetBrains Mono',monospace;color:var(--au-text)">{{ bright.count }}</span></span></div>
+    </article>
+
+    <article aria-label="Relé bancada técnica" style="background:var(--au-bg);border-radius:22px;padding:22px;box-shadow:8px 8px 18px var(--au-shadow-dark),-8px -8px 18px var(--au-shadow-light);display:flex;flex-direction:column;gap:16px;min-width:0">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
+        <div style="display:flex;flex-direction:column;gap:4px"><h3 style="margin:0;font-size:17px;font-weight:700">Relé bancada técnica</h3><span style="font-size:13.5px;color:var(--au-muted)">Estúdio · Relé · Conexão direta</span></div>
+        <span style="font:600 11px 'JetBrains Mono',monospace;color:var(--au-accent-ink);padding:3px 8px;border-radius:999px;box-shadow:inset 2px 2px 4px var(--au-shadow-dark),inset -2px -2px 4px var(--au-shadow-light)">R01</span>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center"><span style="display:inline-flex;align-items:center;gap:7px;padding:5px 11px;border-radius:999px;box-shadow:inset 2px 2px 4px var(--au-shadow-dark),inset -2px -2px 4px var(--au-shadow-light);font-size:12.5px;font-weight:600;color:var(--au-err-ink)"><span style="width:10px;height:10px;border-radius:50%;border:2px solid var(--au-err);box-sizing:border-box"></span>Sem resposta</span><span style="font-size:13px;color:var(--au-muted)">Última leitura <span style="font-family:'JetBrains Mono',monospace;color:var(--au-text)">12:31:07</span></span></div>
+      <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:16px;box-shadow:inset 3px 3px 6px var(--au-shadow-dark),inset -3px -3px 6px var(--au-shadow-light)">
+        <div style="flex:1;display:flex;flex-direction:column;gap:3px"><span style="font-size:15px;font-weight:600">Canal 1 · Bancada</span><span style="font-size:12.5px;color:var(--au-muted)">Último valor conhecido: Ligado às 12:31</span></div>
+        <button role="switch" aria-checked="true" aria-label="Canal 1 bancada: indisponível, sem resposta" disabled="{{ true }}" style="position:relative;width:76px;height:36px;flex:none;border:2px dashed var(--au-dashed);padding:0;border-radius:18px;background:var(--au-bg);cursor:not-allowed"><span style="position:absolute;top:2px;left:40px;width:28px;height:28px;border-radius:50%;background:var(--au-bg);border:1.5px solid var(--au-dashed);box-sizing:border-box"></span></button>
+      </div>
+      <p style="margin:0;font-size:13px;line-height:1.5;color:var(--au-muted)">Controle bloqueado até o equipamento voltar a responder. Consulte o diagnóstico para ver a causa provável.</p>
+    </article>
+
+    <article aria-label="Sensores" style="background:var(--au-bg);border-radius:22px;padding:22px;box-shadow:8px 8px 18px var(--au-shadow-dark),-8px -8px 18px var(--au-shadow-light);display:flex;flex-direction:column;gap:16px;min-width:0">
+      <div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0;font-size:17px;font-weight:700">Cards de sensores</h3><span style="font:600 11px 'JetBrains Mono',monospace;color:var(--au-accent-ink);padding:3px 8px;border-radius:999px;box-shadow:inset 2px 2px 4px var(--au-shadow-dark),inset -2px -2px 4px var(--au-shadow-light)">R06</span></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px">
+        <div style="padding:14px;border-radius:16px;box-shadow:inset 3px 3px 6px var(--au-shadow-dark),inset -3px -3px 6px var(--au-shadow-light);display:flex;flex-direction:column;gap:6px"><span style="font-size:12.5px;color:var(--au-muted)">Escritório · Temperatura</span><span style="font-size:28px;font-weight:700;color:var(--au-text-strong)">24,6 °C</span><span style="font-size:13px">Umidade 52% · Bateria 78%</span><span style="font-size:12px;font-weight:600;color:var(--au-ok-ink)">Leitura atual · há 40 s</span></div>
+        <div style="padding:14px;border-radius:16px;box-shadow:inset 3px 3px 6px var(--au-shadow-dark),inset -3px -3px 6px var(--au-shadow-light);display:flex;flex-direction:column;gap:6px"><span style="font-size:12.5px;color:var(--au-muted)">Sala de reunião 1 · Presença</span><span style="font-size:22px;font-weight:700;color:var(--au-text-strong)">Detectada</span><span style="font-size:13px">Bateria 64%</span><span style="font-size:12px;font-weight:600;color:var(--au-ok-ink)">Leitura atual · há 12 s</span></div>
+        <div style="padding:14px;border-radius:16px;border:1.5px dashed var(--au-dashed);display:flex;flex-direction:column;gap:6px"><span style="font-size:12.5px;color:var(--au-muted)">Corredor · Abertura</span><span style="font-size:22px;font-weight:700;color:var(--au-text-soft)">Fechada</span><span style="font-size:13px;color:var(--au-err-ink);font-weight:600">Bateria 12% · baixa</span><span style="font-size:12px;font-weight:600;color:var(--au-info-ink)">Último valor conhecido · 11:40 · aguardando evento</span></div>
+        <div style="padding:14px;border-radius:16px;border:1.5px dashed var(--au-dashed);display:flex;flex-direction:column;gap:6px"><span style="font-size:12.5px;color:var(--au-muted)">Cobertura · Chuva</span><span style="font-size:22px;font-weight:700;color:var(--au-text-soft)">Sem chuva</span><span style="font-size:13px">Via Gateway Zigbee 02</span><span style="font-size:12px;font-weight:600;color:var(--au-muted)">Desatualizado · último valor 08:15</span></div>
+      </div>
+      <p style="margin:0;font-size:12.5px;color:var(--au-muted)">Borda contínua: leitura atual. Borda tracejada e texto atenuado: último valor conhecido.</p>
+    </article>
+
+    <article aria-label="Gateways e painéis" style="background:var(--au-bg);border-radius:22px;padding:22px;box-shadow:8px 8px 18px var(--au-shadow-dark),-8px -8px 18px var(--au-shadow-light);display:flex;flex-direction:column;gap:16px;min-width:0">
+      <div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0;font-size:17px;font-weight:700">Gateways e painéis inteligentes</h3><span style="font:600 11px 'JetBrains Mono',monospace;color:var(--au-accent-ink);padding:3px 8px;border-radius:999px;box-shadow:inset 2px 2px 4px var(--au-shadow-dark),inset -2px -2px 4px var(--au-shadow-light)">R08</span></div>
+      <div style="padding:16px;border-radius:16px;box-shadow:inset 3px 3px 6px var(--au-shadow-dark),inset -3px -3px 6px var(--au-shadow-light);display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center"><strong style="font-size:15px">Gateway Zigbee 01</strong><span style="display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:{{ gwOk.fg }}"><span style="{{ gwOk.dot }}"></span>Disponível</span></div>
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;font-size:12.5px;color:var(--au-muted)">
+          <div style="display:flex;flex-direction:column;gap:2px">IP<span style="font:600 13px 'JetBrains Mono',monospace;color:var(--au-text)">192.168.10.40</span></div>
+          <div style="display:flex;flex-direction:column;gap:2px">Vinculados<span style="font:600 13px 'JetBrains Mono',monospace;color:var(--au-text)">5</span></div>
+          <div style="display:flex;flex-direction:column;gap:2px">Respondendo<span style="font:600 13px 'JetBrains Mono',monospace;color:var(--au-text)">3 de 5</span></div>
+        </div>
+        <button aria-expanded="{{ gw1Open }}" onClick="{{ toggleGw1 }}" style="align-self:flex-start;border:none;background:var(--au-bg);border-radius:12px;padding:9px 14px;box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:600 13px Figtree,sans-serif;color:var(--au-text);cursor:pointer">{{ gw1Label }}</button>
+        <sc-if value="{{ gw1Open }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column">
+            <sc-for list="{{ gw1Children }}" as="c" hint-placeholder-count="3">
+              <div style="display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-top:1px solid var(--au-divider);font-size:13px;flex-wrap:wrap"><span><strong style="font-weight:600">{{ c.name }}</strong> · {{ c.room }}</span><span style="display:inline-flex;align-items:center;gap:6px;font-weight:600;color:{{ c.st.fg }}"><span style="{{ c.st.dot }}"></span>{{ c.st.label }}</span></div>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+      <div style="padding:16px;border-radius:16px;border:1.5px dashed var(--au-dashed);display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center"><strong style="font-size:15px">Gateway Zigbee 02</strong><span style="display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:{{ gwDown.fg }}"><span style="{{ gwDown.dot }}"></span>Indisponível há 18 min</span></div>
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;font-size:12.5px;color:var(--au-muted)">
+          <div style="display:flex;flex-direction:column;gap:2px">IP<span style="font:600 13px 'JetBrains Mono',monospace;color:var(--au-text)">192.168.10.41</span></div>
+          <div style="display:flex;flex-direction:column;gap:2px">Vinculados<span style="font:600 13px 'JetBrains Mono',monospace;color:var(--au-text)">3</span></div>
+          <div style="display:flex;flex-direction:column;gap:2px">Respondendo<span style="font:600 13px 'JetBrains Mono',monospace;color:var(--au-text)">sem dados</span></div>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section id="s-ajuste" style="display:flex;flex-direction:column;gap:20px;scroll-margin-top:16px">
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap"><span style="font:600 13px 'JetBrains Mono',monospace;color:var(--au-accent-ink)">03</span><h2 style="margin:0;font-size:24px;font-weight:700;color:var(--au-text-strong)">Ajuste preciso, climatização e cortinas</h2><span style="font-size:14px;color:var(--au-muted)">R05 · R13 · R14 · R15</span></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,380px),1fr));gap:26px;align-items:start">
+
+    <article aria-label="Fancoil escritório" style="background:var(--au-bg);border-radius:22px;padding:22px;box-shadow:8px 8px 18px var(--au-shadow-dark),-8px -8px 18px var(--au-shadow-light);display:flex;flex-direction:column;gap:18px;min-width:0">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
+        <div style="display:flex;flex-direction:column;gap:4px"><h3 style="margin:0;font-size:17px;font-weight:700">Fancoil escritório</h3><span style="font-size:13.5px;color:var(--au-muted)">Slider e entrada numérica · limites do equipamento</span></div>
+        <span style="font:600 11px 'JetBrains Mono',monospace;color:var(--au-accent-ink);padding:3px 8px;border-radius:999px;box-shadow:inset 2px 2px 4px var(--au-shadow-dark),inset -2px -2px 4px var(--au-shadow-light)">R05</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;opacity:{{ dimOff }}">
+        <div style="display:flex;justify-content:space-between;align-items:baseline"><span id="temp-lbl" style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--au-muted);font-weight:600">Temperatura desejada</span><span style="font-size:22px;font-weight:700">{{ temp.text }}</span></div>
+        <div role="slider" tabIndex="0" aria-labelledby="temp-lbl" aria-valuemin="16" aria-valuemax="30" aria-valuenow="{{ temp.v }}" aria-valuetext="{{ temp.text }}" onPointerDown="{{ temp.down }}" onPointerMove="{{ temp.move }}" onPointerUp="{{ temp.up }}" onKeyDown="{{ temp.key }}" style="position:relative;height:28px;cursor:pointer;touch-action:none;border-radius:14px">
+          <div style="position:absolute;left:0;right:0;top:9px;height:10px;border-radius:5px;box-shadow:inset 2px 2px 4px var(--au-shadow-dark),inset -2px -2px 4px var(--au-shadow-light)"></div>
+          <div style="position:absolute;left:0;top:9px;height:10px;border-radius:5px;width:{{ temp.pct }};background:linear-gradient(90deg,var(--au-accent-soft),var(--au-accent))"></div>
+          <div style="position:absolute;top:2px;left:{{ temp.thumbX }};width:24px;height:24px;border-radius:50%;background:var(--au-thumb);box-shadow:2px 2px 5px var(--au-shadow-deep),-2px -2px 5px var(--au-shadow-light)"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12.5px;color:var(--au-muted)"><span>{{ temp.minText }}</span><span>{{ temp.maxText }}</span></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;opacity:{{ dimOff }}">
+        <label for="temp-num" style="font-size:13.5px;font-weight:600">Valor exato</label>
+        <div style="display:flex;align-items:center;gap:4px;padding:4px 4px 4px 14px;border-radius:14px;box-shadow:inset 3px 3px 6px var(--au-shadow-dark),inset -3px -3px 6px var(--au-shadow-light)">
+          <input id="temp-num" inputMode="decimal" aria-describedby="temp-err" aria-invalid="{{ hasNumError }}" value="{{ numInput }}" onChange="{{ onNum }}" onKeyDown="{{ onNumKey }}" onBlur="{{ onNumBlur }}" disabled="{{ off }}" style="width:64px;border:none;background:transparent;font:600 16px 'JetBrains Mono',monospace;color:var(--au-text-strong);outline:none"></input>
+          <span style="font-size:13px;color:var(--au-muted);padding-right:6px">°C</span>
+          <div style="display:flex;flex-direction:column;gap:3px">
+            <button aria-label="Aumentar 0,5 °C" disabled="{{ tempAtMax }}" onClick="{{ tempUp }}" style="width:32px;height:20px;border:none;border-radius:7px;background:var(--au-bg);box-shadow:2px 2px 4px var(--au-shadow-dark),-2px -2px 4px var(--au-shadow-light);font:700 11px Figtree;color:var(--au-text);cursor:pointer;padding:0">▲</button>
+            <button aria-label="Diminuir 0,5 °C" disabled="{{ tempAtMin }}" onClick="{{ tempDown }}" style="width:32px;height:20px;border:none;border-radius:7px;background:var(--au-bg);box-shadow:2px 2px 4px var(--au-shadow-dark),-2px -2px 4px var(--au-shadow-light);font:700 11px Figtree;color:var(--au-text);cursor:pointer;padding:0">▼</button>
+          </div>
+        </div>
+        <span style="font-size:12.5px;color:var(--au-muted)">Passo 0,5 °C · Enter aplica</span>
+      </div>
+      <sc-if value="{{ hasNumError }}" hint-placeholder-val="{{ false }}"><p id="temp-err" role="alert" style="margin:0;font-size:13px;font-weight:600;color:var(--au-err-ink)">{{ numError }}</p></sc-if>
+      <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:12.5px;color:var(--au-muted);padding-top:10px;border-top:1px solid var(--au-divider)"><span>{{ temp.sentText }}</span><span>Comandos enviados: <span style="font-family:'JetBrains Mono',monospace;color:var(--au-text)">{{ temp.count }}</span></span></div>
+    </article>
+
+    <article aria-label="Ar-condicionado sala 1" style="background:var(--au-bg);border-radius:22px;padding:22px;box-shadow:8px 8px 18px var(--au-shadow-dark),-8px -8px 18px var(--au-shadow-light);display:flex;flex-direction:column;gap:16px;min-width:0">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
+        <div style="display:flex;flex-direction:column;gap:4px"><h3 style="margin:0;font-size:17px;font-weight:700">Ar-condicionado sala 1</h3><span style="font-size:13.5px;color:var(--au-muted)">Sala de reunião 1 · Infravermelho via Hub IR escritório</span></div>
+        <span style="font:600 11px 'JetBrains Mono',monospace;color:var(--au-accent-ink);padding:3px 8px;border-radius:999px;box-shadow:inset 2px 2px 4px var(--au-shadow-dark),inset -2px -2px 4px var(--au-shadow-light)">R13</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;opacity:{{ dimOff }}">
+        <button aria-pressed="{{ climate.powerAria }}" aria-label="Energia do ar-condicionado" disabled="{{ climate.disabled }}" onClick="{{ powerToggle }}" style="width:68px;height:68px;border-radius:50%;border:none;background:var(--au-bg);box-shadow:{{ climate.powerShadow }};color:{{ climate.powerColor }};cursor:pointer;display:flex;align-items:center;justify-content:center;flex:none"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 3v8"></path><path d="M6.3 6.8a8 8 0 1 0 11.4 0"></path></svg></button>
+        <div style="display:flex;align-items:center;gap:12px">
+          <button aria-label="Diminuir temperatura" disabled="{{ climate.disabled }}" onClick="{{ setDown }}" style="width:40px;height:40px;border:none;border-radius:12px;background:var(--au-bg);box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:700 18px Figtree;color:var(--au-text);cursor:pointer">−</button>
+          <div style="display:flex;flex-direction:column;align-items:center;min-width:90px"><span style="font-size:30px;font-weight:700;color:var(--au-text-strong)">{{ climate.setText }}</span><span style="font-size:12px;color:var(--au-muted)">{{ climate.powerText }} · 17–30 °C</span></div>
+          <button aria-label="Aumentar temperatura" disabled="{{ climate.disabled }}" onClick="{{ setUp }}" style="width:40px;height:40px;border:none;border-radius:12px;background:var(--au-bg);box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:700 18px Figtree;color:var(--au-text);cursor:pointer">+</button>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;opacity:{{ dimOff }}"><span style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--au-muted);font-weight:600">Modo</span>
+        <div role="radiogroup" aria-label="Modo" style="display:flex;gap:8px;flex-wrap:wrap"><sc-for list="{{ climate.modes }}" as="m" hint-placeholder-count="4"><button role="radio" aria-checked="{{ m.aria }}" disabled="{{ m.disabled }}" onClick="{{ m.pick }}" style="flex:1;min-width:64px;border:none;background:var(--au-bg);border-radius:12px;padding:9px 10px;box-shadow:{{ m.shadow }};font-family:Figtree,sans-serif;font-size:13px;font-weight:{{ m.weight }};color:{{ m.color }};cursor:pointer">{{ m.label }}</button></sc-for></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;opacity:{{ dimOff }}"><span style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--au-muted);font-weight:600">Ventilação</span>
+        <div role="radiogroup" aria-label="Ventilação" style="display:flex;gap:8px;flex-wrap:wrap"><sc-for list="{{ climate.fans }}" as="m" hint-placeholder-count="4"><button role="radio" aria-checked="{{ m.aria }}" disabled="{{ m.disabled }}" onClick="{{ m.pick }}" style="flex:1;min-width:64px;border:none;background:var(--au-bg);border-radius:12px;padding:9px 10px;box-shadow:{{ m.shadow }};font-family:Figtree,sans-serif;font-size:13px;font-weight:{{ m.weight }};color:{{ m.color }};cursor:pointer">{{ m.label }}</button></sc-for></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;opacity:{{ dimOff }}"><span style="font-size:14px;font-weight:600">Oscilação</span>
+        <button role="switch" aria-checked="{{ climate.oscAria }}" aria-label="Oscilação" disabled="{{ climate.disabled }}" onClick="{{ oscToggle }}" style="position:relative;width:62px;height:32px;border:none;padding:0;border-radius:16px;background:{{ climate.oscBg }};box-shadow:inset 3px 3px 6px var(--au-shadow-dark),inset -3px -3px 6px var(--au-shadow-light);cursor:pointer"><span style="position:absolute;top:4px;left:{{ climate.oscLeft }};width:24px;height:24px;border-radius:50%;background:var(--au-thumb);box-shadow:2px 2px 5px var(--au-shadow-deep),-1px -1px 3px var(--au-shadow-light);transition:left .2s"></span></button>
+      </div>
+      <div style="padding:12px 14px;border-radius:14px;border:1.5px dashed var(--au-dashed);display:flex;flex-direction:column;gap:6px">
+        <span style="display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:{{ climate.st.fg }}"><span style="{{ climate.st.dot }}"></span>{{ climate.st.label }}</span>
+        <span style="font-size:12.5px;color:var(--au-muted)">Último comando: {{ climate.last }} · <span style="font-family:'JetBrains Mono',monospace">{{ climate.sentAt }}</span>. O equipamento não informa estado; os valores exibidos são os últimos enviados.</span>
+      </div>
+    </article>
+
+    <article aria-label="Cortinas e persianas" style="background:var(--au-bg);border-radius:22px;padding:22px;box-shadow:8px 8px 18px var(--au-shadow-dark),-8px -8px 18px var(--au-shadow-light);display:flex;flex-direction:column;gap:16px;min-width:0">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
+        <div style="display:flex;flex-direction:column;gap:4px"><h3 style="margin:0;font-size:17px;font-weight:700">Persiana estúdio</h3><span style="font-size:13.5px;color:var(--au-muted)">Estúdio · Cortina · Posição informada</span></div>
+        <span style="font:600 11px 'JetBrains Mono',monospace;color:var(--au-accent-ink);padding:3px 8px;border-radius:999px;box-shadow:inset 2px 2px 4px var(--au-shadow-dark),inset -2px -2px 4px var(--au-shadow-light)">R14</span>
+      </div>
+      <div style="display:flex;gap:24px;align-items:center;flex-wrap:wrap;opacity:{{ dimOff }}">
+        <div style="display:flex;gap:10px;align-items:stretch;height:200px">
+          <div role="slider" tabIndex="0" aria-label="Posição da persiana, 0 fechada, 100 aberta" aria-orientation="vertical" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ curtain.v }}" aria-valuetext="{{ curtain.text }} aberta" onPointerDown="{{ curtain.down }}" onPointerMove="{{ curtain.move }}" onPointerUp="{{ curtain.up }}" onKeyDown="{{ curtain.key }}" style="position:relative;width:44px;height:200px;cursor:pointer;touch-action:none;border-radius:10px">
+            <div style="position:absolute;top:0;bottom:0;left:18px;width:8px;border-radius:4px;box-shadow:inset 2px 2px 4px var(--au-shadow-dark),inset -2px -2px 4px var(--au-shadow-light)"></div>
+            <div style="position:absolute;bottom:0;left:18px;width:8px;border-radius:4px;height:{{ curtain.pct }};background:linear-gradient(0deg,var(--au-accent),var(--au-accent-soft))"></div>
+            <div style="position:absolute;left:4px;bottom:{{ curtain.thumbY }};width:36px;height:20px;border-radius:7px;background:linear-gradient(180deg,var(--au-knob-hi),var(--au-knob-lo));box-shadow:2px 3px 6px var(--au-shadow-deep),-2px -2px 4px var(--au-shadow-light);display:flex;align-items:center;justify-content:center"><span style="width:18px;height:2px;background:var(--au-tick);border-radius:1px"></span></div>
+          </div>
+          <div style="display:flex;flex-direction:column;justify-content:space-between;padding:9px 0">
+            <sc-for list="{{ ticks }}" as="t" hint-placeholder-count="11"><div style="display:flex;align-items:center;gap:6px;height:1px"><span style="width:{{ t.w }};height:1px;background:var(--au-tick)"></span><span style="font:400 10.5px 'JetBrains Mono',monospace;color:var(--au-muted)">{{ t.l }}</span></div></sc-for>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;flex:1;min-width:150px">
+          <span style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--au-muted);font-weight:600">Posição confirmada</span>
+          <span style="font-size:36px;font-weight:700;line-height:1">{{ curtain.text }}</span>
+          <span style="display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:{{ cSt.fg }}"><span style="{{ cSt.dot }}"></span>{{ cMoveText }}</span>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button disabled="{{ off }}" onClick="{{ cOpen }}" style="border:none;background:var(--au-bg);border-radius:12px;padding:9px 12px;box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:600 13px Figtree,sans-serif;color:var(--au-text);cursor:pointer">Abrir</button>
+            <button disabled="{{ off }}" onClick="{{ cStop }}" style="border:none;background:var(--au-bg);border-radius:12px;padding:9px 12px;box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:600 13px Figtree,sans-serif;color:var(--au-text);cursor:pointer">Parar</button>
+            <button disabled="{{ off }}" onClick="{{ cClose }}" style="border:none;background:var(--au-bg);border-radius:12px;padding:9px 12px;box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:600 13px Figtree,sans-serif;color:var(--au-text);cursor:pointer">Fechar</button>
+          </div>
+        </div>
+      </div>
+      <div style="padding:14px 16px;border-radius:16px;border:1.5px dashed var(--au-dashed);display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><strong style="font-size:14.5px">Cortina sala 1 · IR</strong><span style="display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:{{ noPos.fg }}"><span style="{{ noPos.dot }}"></span>Posição não informada</span></div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;opacity:{{ dimOff }}">
+          <button disabled="{{ s1.disabled }}" onClick="{{ s1Open }}" style="border:none;background:var(--au-bg);border-radius:12px;padding:8px 12px;box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:600 13px Figtree,sans-serif;color:var(--au-text);cursor:pointer">Abrir</button>
+          <button disabled="{{ s1.disabled }}" onClick="{{ s1Stop }}" style="border:none;background:var(--au-bg);border-radius:12px;padding:8px 12px;box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:600 13px Figtree,sans-serif;color:var(--au-text);cursor:pointer">Parar</button>
+          <button disabled="{{ s1.disabled }}" onClick="{{ s1Close }}" style="border:none;background:var(--au-bg);border-radius:12px;padding:8px 12px;box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:600 13px Figtree,sans-serif;color:var(--au-text);cursor:pointer">Fechar</button>
+        </div>
+        <span style="display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:{{ s1.st.fg }}"><span style="{{ s1.st.dot }}"></span>{{ s1.st.label }} · último: {{ s1.last }}</span>
+      </div>
+    </article>
+
+    <article aria-label="Ações específicas" style="background:var(--au-bg);border-radius:22px;padding:22px;box-shadow:8px 8px 18px var(--au-shadow-dark),-8px -8px 18px var(--au-shadow-light);display:flex;flex-direction:column;gap:16px;min-width:0">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
+        <div style="display:flex;flex-direction:column;gap:4px"><h3 style="margin:0;font-size:17px;font-weight:700">Ações específicas</h3><span style="font-size:13.5px;color:var(--au-muted)">Liberadas somente após mapear e testar</span></div>
+        <span style="font:600 11px 'JetBrains Mono',monospace;color:var(--au-accent-ink);padding:3px 8px;border-radius:999px;box-shadow:inset 2px 2px 4px var(--au-shadow-dark),inset -2px -2px 4px var(--au-shadow-light)">R15</span>
+      </div>
+      <sc-for list="{{ actGroups }}" as="g" hint-placeholder-count="2">
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <span style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--au-muted);font-weight:600">{{ g.name }}</span>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px">
+            <sc-for list="{{ g.items }}" as="a" hint-placeholder-count="3">
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <button disabled="{{ a.disabled }}" onClick="{{ a.run }}" style="border:none;background:var(--au-bg);border-radius:14px;padding:12px 10px;box-shadow:{{ a.shadow }};font:600 13.5px Figtree,sans-serif;color:{{ a.color }};cursor:pointer;text-align:left">{{ a.label }}</button>
+                <span style="font-size:11.5px;font-weight:600;color:{{ a.stColor }};padding-left:4px">{{ a.stText }}</span>
+                <sc-if value="{{ a.canTest }}" hint-placeholder-val="{{ false }}"><button disabled="{{ a.testing }}" onClick="{{ a.test }}" style="align-self:flex-start;border:none;background:transparent;padding:2px 4px;font:600 12px Figtree,sans-serif;color:var(--au-accent-ink);cursor:pointer;text-decoration:underline">Testar ação</button></sc-if>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </article>
+  </div>
+</section>
+
+<section id="s-cenas" style="display:flex;flex-direction:column;gap:20px;scroll-margin-top:16px">
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap"><span style="font:600 13px 'JetBrains Mono',monospace;color:var(--au-accent-ink)">04</span><h2 style="margin:0;font-size:24px;font-weight:700;color:var(--au-text-strong)">Grupos, cenas e agendamentos</h2><span style="font-size:14px;color:var(--au-muted)">R16 · R17 · R18 · R22</span></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,380px),1fr));gap:26px;align-items:start">
+
+    <article aria-label="Grupo Iluminação Ala Norte" style="background:var(--au-bg);border-radius:22px;padding:22px;box-shadow:8px 8px 18px var(--au-shadow-dark),-8px -8px 18px var(--au-shadow-light);display:flex;flex-direction:column;gap:16px;min-width:0">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
+        <div style="display:flex;flex-direction:column;gap:4px"><h3 style="margin:0;font-size:17px;font-weight:700">Iluminação Ala Norte</h3><span style="font-size:13.5px;color:var(--au-muted)">Grupo de acionamento · 5 equipamentos</span></div>
+        <span style="font:600 11px 'JetBrains Mono',monospace;color:var(--au-accent-ink);padding:3px 8px;border-radius:999px;box-shadow:inset 2px 2px 4px var(--au-shadow-dark),inset -2px -2px 4px var(--au-shadow-light)">R16</span>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button disabled="{{ groupBusy }}" onClick="{{ groupOn }}" style="border:none;border-radius:12px;padding:10px 16px;background:linear-gradient(180deg,var(--au-accent-hi),var(--au-accent-lo));box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:700 14px Figtree,sans-serif;color:var(--au-on-accent);cursor:pointer;opacity:{{ dimOff }}">Ligar grupo</button>
+        <button disabled="{{ groupBusy }}" onClick="{{ groupOff }}" style="border:none;background:var(--au-bg);border-radius:12px;padding:10px 16px;box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:600 14px Figtree,sans-serif;color:var(--au-text);cursor:pointer;opacity:{{ dimOff }}">Desligar grupo</button>
+      </div>
+      <div aria-live="polite" style="display:flex;flex-direction:column;padding:6px 16px;border-radius:16px;box-shadow:inset 3px 3px 6px var(--au-shadow-dark),inset -3px -3px 6px var(--au-shadow-light)">
+        <sc-for list="{{ groupMembers }}" as="m" hint-placeholder-count="5">
+          <div style="display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--au-divider);font-size:13.5px;flex-wrap:wrap"><span>{{ m.name }}</span>
+            <sc-if value="{{ m.has }}" hint-placeholder-val="{{ false }}"><span style="display:inline-flex;align-items:center;gap:6px;font-weight:600;color:{{ m.st.fg }}"><span style="{{ m.st.dot }}"></span>{{ m.st.label }}</span></sc-if>
+          </div>
+        </sc-for>
+      </div>
+      <span style="font-size:13px;font-weight:600;color:var(--au-text)">{{ groupSummary }}</span>
+    </article>
+
+    <article aria-label="Cenas" style="background:var(--au-bg);border-radius:22px;padding:22px;box-shadow:8px 8px 18px var(--au-shadow-dark),-8px -8px 18px var(--au-shadow-light);display:flex;flex-direction:column;gap:16px;min-width:0">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
+        <div style="display:flex;flex-direction:column;gap:4px"><h3 style="margin:0;font-size:17px;font-weight:700">Cenas</h3><span style="font-size:13.5px;color:var(--au-muted)">Os dispositivos afetados são exibidos antes da execução</span></div>
+        <span style="font:600 11px 'JetBrains Mono',monospace;color:var(--au-accent-ink);padding:3px 8px;border-radius:999px;box-shadow:inset 2px 2px 4px var(--au-shadow-dark),inset -2px -2px 4px var(--au-shadow-light)">R17</span>
+      </div>
+      <sc-for list="{{ scenes }}" as="sc" hint-placeholder-count="2">
+        <div style="padding:16px;border-radius:16px;box-shadow:inset 3px 3px 6px var(--au-shadow-dark),inset -3px -3px 6px var(--au-shadow-light);display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+            <div style="display:flex;flex-direction:column;gap:2px"><strong style="font-size:15.5px">{{ sc.name }}</strong><span style="font-size:12.5px;color:var(--au-muted)">{{ sc.desc }} · {{ sc.count }} ações</span></div>
+            <button disabled="{{ off }}" onClick="{{ sc.preview }}" style="border:none;background:var(--au-bg);border-radius:12px;padding:9px 14px;box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:600 13px Figtree,sans-serif;color:var(--au-text);cursor:pointer;flex:none;opacity:{{ dimOff }}">Revisar e executar</button>
+          </div>
+          <sc-if value="{{ sc.hasRes }}" hint-placeholder-val="{{ false }}">
+            <div aria-live="polite" style="display:flex;flex-direction:column">
+              <sc-for list="{{ sc.results }}" as="r" hint-placeholder-count="4">
+                <div style="display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-top:1px solid var(--au-divider);font-size:12.5px;flex-wrap:wrap"><span>{{ r.dev }} · {{ r.act }}</span><span style="display:inline-flex;align-items:center;gap:6px;font-weight:600;color:{{ r.st.fg }}"><span style="{{ r.st.dot }}"></span>{{ r.st.label }}</span></div>
+              </sc-for>
+              <span style="font-size:12.5px;font-weight:600;padding-top:6px">{{ sc.summary }}</span>
+            </div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </article>
+
+    <article aria-label="Temporizadores e agendamentos" style="background:var(--au-bg);border-radius:22px;padding:22px;box-shadow:8px 8px 18px var(--au-shadow-dark),-8px -8px 18px var(--au-shadow-light);display:flex;flex-direction:column;gap:16px;min-width:0">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
+        <div style="display:flex;flex-direction:column;gap:4px"><h3 style="margin:0;font-size:17px;font-weight:700">Temporizadores e agendamentos</h3><span style="font-size:13.5px;color:var(--au-muted)">Executados pelo serviço local</span></div>
+        <span style="font:600 11px 'JetBrains Mono',monospace;color:var(--au-accent-ink);padding:3px 8px;border-radius:999px;box-shadow:inset 2px 2px 4px var(--au-shadow-dark),inset -2px -2px 4px var(--au-shadow-light)">R18</span>
+      </div>
+      <sc-for list="{{ schedules }}" as="h" hint-placeholder-count="3">
+        <div style="padding:14px 16px;border-radius:16px;box-shadow:inset 3px 3px 6px var(--au-shadow-dark),inset -3px -3px 6px var(--au-shadow-light);display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><strong style="font-size:14.5px">{{ h.name }}</strong><span style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:{{ h.stColor }}"><span style="{{ h.stDot }}"></span>{{ h.stText }}</span></div>
+          <span style="font-size:12.5px;color:var(--au-muted)">{{ h.when }} · Próxima execução: <strong style="color:var(--au-text);font-weight:600">{{ h.nextText }}</strong></span>
+          <div style="display:flex;gap:8px">
+            <button onClick="{{ h.pause }}" style="border:none;background:var(--au-bg);border-radius:10px;padding:7px 12px;box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:600 12.5px Figtree,sans-serif;color:var(--au-text);cursor:pointer">{{ h.pauseLabel }}</button>
+            <button onClick="{{ h.cancel }}" style="border:none;background:var(--au-bg);border-radius:10px;padding:7px 12px;box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:600 12.5px Figtree,sans-serif;color:var(--au-err-ink);cursor:pointer">Cancelar</button>
+          </div>
+        </div>
+      </sc-for>
+      <sc-if value="{{ schedEmpty }}" hint-placeholder-val="{{ false }}"><p style="margin:0;font-size:13.5px;color:var(--au-muted)">Nenhum agendamento ativo.</p></sc-if>
+      <p style="margin:0;font-size:12.5px;line-height:1.5;color:var(--au-muted)">Agendamentos dependem do serviço local em funcionamento. Se ele estiver parado no horário programado, a ação não é executada.</p>
+    </article>
+  </div>
+</section>
+
+<section id="s-amb" style="display:flex;flex-direction:column;gap:20px;scroll-margin-top:16px">
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap"><span style="font:600 13px 'JetBrains Mono',monospace;color:var(--au-accent-ink)">05</span><h2 style="margin:0;font-size:24px;font-weight:700;color:var(--au-text-strong)">Ambientes, busca e favoritos</h2><span style="font-size:14px;color:var(--au-muted)">R09 · R10 · R11</span></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,440px),1fr));gap:26px;align-items:start">
+    <article aria-label="Navegação de dispositivos" style="background:var(--au-bg);border-radius:22px;padding:22px;box-shadow:8px 8px 18px var(--au-shadow-dark),-8px -8px 18px var(--au-shadow-light);display:flex;flex-direction:column;gap:16px;min-width:0">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><h3 style="margin:0;font-size:17px;font-weight:700">Ambientes e grupos</h3><span style="font:600 11px 'JetBrains Mono',monospace;color:var(--au-accent-ink);padding:3px 8px;border-radius:999px;box-shadow:inset 2px 2px 4px var(--au-shadow-dark),inset -2px -2px 4px var(--au-shadow-light)">R09 · R10</span></div>
+      <div role="tablist" aria-label="Ambientes" style="display:flex;gap:8px;flex-wrap:wrap">
+        <sc-for list="{{ roomTabs }}" as="r" hint-placeholder-count="6">
+          <button role="tab" aria-selected="{{ r.aria }}" onClick="{{ r.pick }}" style="border:none;background:var(--au-bg);border-radius:12px;padding:8px 13px;box-shadow:{{ r.shadow }};font-family:Figtree,sans-serif;font-size:13px;font-weight:{{ r.weight }};color:{{ r.color }};cursor:pointer;display:flex;gap:6px;align-items:center">{{ r.label }}<span style="font:400 11.5px 'JetBrains Mono',monospace;color:var(--au-muted)">{{ r.count }}</span></button>
+        </sc-for>
+      </div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
+        <div style="flex:1;min-width:220px;display:flex;align-items:center;gap:8px;padding:0 14px;height:42px;border-radius:21px;box-shadow:inset 3px 3px 6px var(--au-shadow-dark),inset -3px -3px 6px var(--au-shadow-light)">
+          <input type="search" aria-label="Buscar dispositivos por nome, ambiente, tipo, gateway ou disponibilidade" placeholder="Buscar por nome, ambiente, tipo, gateway…" value="{{ query }}" onChange="{{ onQuery }}" style="flex:1;min-width:0;border:none;background:transparent;font:500 14px Figtree,sans-serif;color:var(--au-text-strong);outline:none"></input>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style="stroke:var(--au-faint)" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6"></circle><path d="M15 15l5 5"></path></svg>
+        </div>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--au-muted)">Tipo
+          <select value="{{ fType }}" onChange="{{ onType }}" style="appearance:none;border:none;background:var(--au-bg);border-radius:12px;padding:9px 14px;box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:600 13px Figtree,sans-serif;color:var(--au-text);cursor:pointer"><sc-for list="{{ typeOpts }}" as="o" hint-placeholder-count="3"><option value="{{ o.v }}">{{ o.v }}</option></sc-for></select></label>
+        <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--au-muted)">Gateway
+          <select value="{{ fGw }}" onChange="{{ onGw }}" style="appearance:none;border:none;background:var(--au-bg);border-radius:12px;padding:9px 14px;box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:600 13px Figtree,sans-serif;color:var(--au-text);cursor:pointer"><sc-for list="{{ gwOpts }}" as="o" hint-placeholder-count="3"><option value="{{ o.v }}">{{ o.v }}</option></sc-for></select></label>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <sc-for list="{{ filterChips }}" as="c" hint-placeholder-count="3">
+          <button aria-pressed="{{ c.aria }}" onClick="{{ c.toggle }}" style="border:none;background:var(--au-bg);border-radius:999px;padding:7px 14px;box-shadow:{{ c.shadow }};font:600 13px Figtree,sans-serif;color:{{ c.color }};cursor:pointer;display:flex;gap:6px;align-items:center"><span aria-hidden="true">{{ c.mark }}</span>{{ c.label }}</button>
+        </sc-for>
+        <span style="margin-left:auto;font-size:12.5px;color:var(--au-muted)" aria-live="polite">{{ resultText }}</span>
+      </div>
+      <div style="display:flex;flex-direction:column;border-radius:16px;box-shadow:inset 3px 3px 6px var(--au-shadow-dark),inset -3px -3px 6px var(--au-shadow-light);padding:4px 16px">
+        <sc-for list="{{ devices }}" as="d" hint-placeholder-count="6">
+          <div style="display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;padding:12px 0;border-bottom:1px solid var(--au-divider)">
+            <button aria-pressed="{{ d.favAria }}" aria-label="{{ d.favLabel }}" onClick="{{ d.toggleFav }}" style="width:34px;height:34px;border:none;border-radius:10px;background:var(--au-bg);box-shadow:2px 2px 5px var(--au-shadow-dark),-2px -2px 5px var(--au-shadow-light);color:{{ d.starColor }};font-size:16px;cursor:pointer;padding:0">{{ d.star }}</button>
+            <div style="display:flex;flex-direction:column;gap:3px;min-width:200px;flex:1 1 220px">
+              <span style="font-size:14.5px;font-weight:600">{{ d.name }}</span>
+              <span style="font-size:12.5px;color:var(--au-muted)">{{ d.room }} · {{ d.type }} · {{ d.via }} · {{ d.ctrlText }}</span>
+              <span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:{{ d.st.fg }}"><span style="{{ d.st.dot }}"></span>{{ d.st.label }}<span style="font-family:'JetBrains Mono',monospace;font-weight:400;color:var(--au-muted)">· {{ d.id }}</span></span>
+            </div>
+            <label style="display:flex;flex-direction:column;gap:3px;font-size:11.5px;color:var(--au-muted)">Mover para
+              <select value="{{ d.room }}" onChange="{{ d.move }}" aria-label="Mover dispositivo para outro ambiente" style="appearance:none;border:none;background:var(--au-bg);border-radius:10px;padding:7px 10px;box-shadow:2px 2px 5px var(--au-shadow-dark),-2px -2px 5px var(--au-shadow-light);font:600 12.5px Figtree,sans-serif;color:var(--au-text);cursor:pointer;max-width:150px"><sc-for list="{{ d.roomOpts }}" as="o" hint-placeholder-count="4"><option value="{{ o.r }}">{{ o.r }}</option></sc-for></select></label>
+          </div>
+        </sc-for>
+        <sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}"><p style="margin:0;padding:18px 0;font-size:14px;color:var(--au-muted)">Nenhum dispositivo corresponde aos filtros.</p></sc-if>
+      </div>
+      <p style="margin:0;font-size:12.5px;color:var(--au-muted)">Mover um dispositivo altera apenas o ambiente. A identidade técnica exibida ao lado do estado permanece a mesma.</p>
+    </article>
+
+    <article aria-label="Favoritos" style="background:var(--au-bg);border-radius:22px;padding:22px;box-shadow:8px 8px 18px var(--au-shadow-dark),-8px -8px 18px var(--au-shadow-light);display:flex;flex-direction:column;gap:16px;min-width:0">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><h3 style="margin:0;font-size:17px;font-weight:700">Favoritos</h3><span style="font:600 11px 'JetBrains Mono',monospace;color:var(--au-accent-ink);padding:3px 8px;border-radius:999px;box-shadow:inset 2px 2px 4px var(--au-shadow-dark),inset -2px -2px 4px var(--au-shadow-light)">R11</span></div>
+      <ol style="margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px">
+        <sc-for list="{{ favs }}" as="f" hint-placeholder-count="4">
+          <li style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;box-shadow:inset 2px 2px 5px var(--au-shadow-dark),inset -2px -2px 5px var(--au-shadow-light)">
+            <span style="font:600 12px 'JetBrains Mono',monospace;color:var(--au-muted);width:16px">{{ f.pos }}</span>
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span style="font-size:14px;font-weight:600">{{ f.label }}</span><span style="font-size:12px;color:var(--au-muted)">{{ f.sub }}</span></div>
+            <button aria-label="{{ f.upLabel }}" disabled="{{ f.first }}" onClick="{{ f.up }}" style="width:30px;height:30px;border:none;border-radius:9px;background:var(--au-bg);box-shadow:2px 2px 5px var(--au-shadow-dark),-2px -2px 5px var(--au-shadow-light);font:700 11px Figtree;color:var(--au-text);cursor:pointer;padding:0">▲</button>
+            <button aria-label="{{ f.downLabel }}" disabled="{{ f.last }}" onClick="{{ f.down }}" style="width:30px;height:30px;border:none;border-radius:9px;background:var(--au-bg);box-shadow:2px 2px 5px var(--au-shadow-dark),-2px -2px 5px var(--au-shadow-light);font:700 11px Figtree;color:var(--au-text);cursor:pointer;padding:0">▼</button>
+            <button aria-label="{{ f.rmLabel }}" onClick="{{ f.remove }}" style="width:30px;height:30px;border:none;border-radius:9px;background:var(--au-bg);box-shadow:2px 2px 5px var(--au-shadow-dark),-2px -2px 5px var(--au-shadow-light);font-size:15px;color:var(--au-star);cursor:pointer;padding:0">★</button>
+          </li>
+        </sc-for>
+      </ol>
+      <sc-if value="{{ favEmpty }}" hint-placeholder-val="{{ false }}"><p style="margin:0;font-size:13.5px;color:var(--au-muted)">Use a estrela na lista de dispositivos para fixar favoritos.</p></sc-if>
+      <p style="margin:0;font-size:12.5px;color:var(--au-muted)">A ordem definida aqui é usada na tela inicial.</p>
+    </article>
+  </div>
+</section>
+
+<section id="s-hist" style="display:flex;flex-direction:column;gap:20px;scroll-margin-top:16px">
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap"><span style="font:600 13px 'JetBrains Mono',monospace;color:var(--au-accent-ink)">06</span><h2 style="margin:0;font-size:24px;font-weight:700;color:var(--au-text-strong)">Histórico, atividade e alertas</h2><span style="font-size:14px;color:var(--au-muted)">R19 · R20 · R21</span></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,420px),1fr));gap:26px;align-items:start">
+    <article aria-label="Gráficos e histórico" style="background:var(--au-bg);border-radius:22px;padding:22px;box-shadow:8px 8px 18px var(--au-shadow-dark),-8px -8px 18px var(--au-shadow-light);display:flex;flex-direction:column;gap:16px;min-width:0">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap">
+        <div style="display:flex;flex-direction:column;gap:4px"><h3 style="margin:0;font-size:17px;font-weight:700">Temperatura · Escritório</h3><span style="font-size:13px;color:var(--au-muted)">Atual {{ chart.last }} · mín. {{ chart.min }} · máx. {{ chart.max }}</span></div>
+        <span style="font:600 11px 'JetBrains Mono',monospace;color:var(--au-accent-ink);padding:3px 8px;border-radius:999px;box-shadow:inset 2px 2px 4px var(--au-shadow-dark),inset -2px -2px 4px var(--au-shadow-light)">R19</span>
+      </div>
+      <div role="radiogroup" aria-label="Período" style="display:flex;gap:8px"><sc-for list="{{ chart.periods }}" as="p" hint-placeholder-count="3"><button role="radio" aria-checked="{{ p.aria }}" onClick="{{ p.pick }}" style="border:none;background:var(--au-bg);border-radius:12px;padding:7px 13px;box-shadow:{{ p.shadow }};font-family:Figtree,sans-serif;font-size:13px;font-weight:{{ p.weight }};color:{{ p.color }};cursor:pointer">{{ p.label }}</button></sc-for></div>
+      <div style="padding:14px;border-radius:16px;box-shadow:inset 3px 3px 6px var(--au-shadow-dark),inset -3px -3px 6px var(--au-shadow-light);display:flex;flex-direction:column;gap:8px">
+        <svg viewBox="0 0 600 180" preserveAspectRatio="none" role="img" aria-label="Gráfico de temperatura do escritório no período selecionado" style="width:100%;height:170px;display:block">
+          <path d="M10 30 H590 M10 70 H590 M10 110 H590 M10 150 H590" style="stroke:var(--au-track)" stroke-width="1" fill="none"></path>
+          <path d="{{ chart.area }}" style="fill:var(--au-accent-wash)"></path>
+          <path d="{{ chart.line }}" fill="none" style="stroke:var(--au-accent)" stroke-width="2.5" stroke-linejoin="round"></path>
+        </svg>
+        <div style="display:flex;justify-content:space-between;font:400 11px 'JetBrains Mono',monospace;color:var(--au-muted)"><sc-for list="{{ chart.labels }}" as="l" hint-placeholder-count="5"><span>{{ l.l }}</span></sc-for></div>
+        <div style="display:flex;flex-direction:column;gap:5px;margin-top:6px"><span style="font-size:12px;color:var(--au-muted)">Mudanças de estado · Luz principal (faixa = ligada)</span>
+          <div style="position:relative;height:12px;border-radius:6px;box-shadow:inset 2px 2px 4px var(--au-shadow-dark),inset -2px -2px 4px var(--au-shadow-light)"><sc-for list="{{ chart.bands }}" as="b" hint-placeholder-count="2"><span style="position:absolute;top:2px;bottom:2px;left:{{ b.left }};width:{{ b.width }};border-radius:4px;background:var(--au-accent)"></span></sc-for></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <span style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--au-muted);font-weight:600">Consumo · Relé bancada técnica (kWh/dia)</span>
+        <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;align-items:end;height:110px">
+          <sc-for list="{{ energy }}" as="e" hint-placeholder-count="7"><div style="display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end"><span style="font:400 10.5px 'JetBrains Mono',monospace;color:var(--au-text)">{{ e.k }}</span><div style="width:100%;max-width:26px;height:{{ e.h }};max-height:70px;border-radius:6px 6px 3px 3px;background:linear-gradient(180deg,var(--au-accent-soft),var(--au-accent))"></div><span style="font-size:11px;color:var(--au-muted)">{{ e.d }}</span></div></sc-for>
+        </div>
+        <span style="font-size:12.5px;color:var(--au-muted)">Módulo iluminação 3 canais e Dimmer estúdio não fornecem medição de consumo.</span>
+      </div>
+    </article>
+
+    <article aria-label="Alertas" style="background:var(--au-bg);border-radius:22px;padding:22px;box-shadow:8px 8px 18px var(--au-shadow-dark),-8px -8px 18px var(--au-shadow-light);display:flex;flex-direction:column;gap:14px;min-width:0">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
+        <div style="display:flex;flex-direction:column;gap:4px"><h3 style="margin:0;font-size:17px;font-weight:700">Alertas e notificações</h3><span style="font-size:13px;color:var(--au-muted)">{{ openAlerts }} ativos</span></div>
+        <span style="font:600 11px 'JetBrains Mono',monospace;color:var(--au-accent-ink);padding:3px 8px;border-radius:999px;box-shadow:inset 2px 2px 4px var(--au-shadow-dark),inset -2px -2px 4px var(--au-shadow-light)">R21</span>
+      </div>
+      <sc-for list="{{ alerts }}" as="a" hint-placeholder-count="4">
+        <div style="padding:14px 16px;border-radius:16px;box-shadow:inset 3px 3px 6px var(--au-shadow-dark),inset -3px -3px 6px var(--au-shadow-light);display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><span style="display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:700;color:{{ a.sevColor }}"><span style="{{ a.sevDot }}"></span>Severidade {{ a.sev }}</span><span style="font:400 12px 'JetBrains Mono',monospace;color:var(--au-muted)">{{ a.time }} · {{ a.stText }}</span></div>
+          <strong style="font-size:14.5px">{{ a.title }}</strong>
+          <span style="font-size:12.5px;color:var(--au-muted)">{{ a.detail }}</span>
+          <sc-if value="{{ a.open }}" hint-placeholder-val="{{ true }}"><div style="display:flex;gap:8px">
+            <button onClick="{{ a.ack }}" style="border:none;background:var(--au-bg);border-radius:10px;padding:7px 12px;box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:600 12.5px Figtree,sans-serif;color:var(--au-text);cursor:pointer">Reconhecer</button>
+            <button onClick="{{ a.silence }}" style="border:none;background:var(--au-bg);border-radius:10px;padding:7px 12px;box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:600 12.5px Figtree,sans-serif;color:var(--au-text);cursor:pointer">Silenciar 1 h</button>
+          </div></sc-if>
+          <sc-if value="{{ a.closed }}" hint-placeholder-val="{{ false }}"><button onClick="{{ a.reopen }}" style="align-self:flex-start;border:none;background:transparent;padding:0;font:600 12.5px Figtree,sans-serif;color:var(--au-accent-ink);cursor:pointer;text-decoration:underline">Reativar</button></sc-if>
+        </div>
+      </sc-for>
+    </article>
+
+    <article aria-label="Central de atividade" style="grid-column:1/-1;background:var(--au-bg);border-radius:22px;padding:22px;box-shadow:8px 8px 18px var(--au-shadow-dark),-8px -8px 18px var(--au-shadow-light);display:flex;flex-direction:column;gap:14px;min-width:0">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start">
+        <div style="display:flex;flex-direction:column;gap:4px"><h3 style="margin:0;font-size:17px;font-weight:700">Central de atividade</h3><span style="font-size:13px;color:var(--au-muted)">Comandos, resultados, falhas e conectividade · credenciais nunca são registradas</span></div>
+        <span style="font:600 11px 'JetBrains Mono',monospace;color:var(--au-accent-ink);padding:3px 8px;border-radius:999px;box-shadow:inset 2px 2px 4px var(--au-shadow-dark),inset -2px -2px 4px var(--au-shadow-light)">R20</span>
+      </div>
+      <div style="overflow-x:auto;border-radius:16px;box-shadow:inset 3px 3px 6px var(--au-shadow-dark),inset -3px -3px 6px var(--au-shadow-light);padding:6px 16px">
+        <table style="width:100%;border-collapse:collapse;font-size:13px;min-width:720px">
+          <thead><tr style="text-align:left;color:var(--au-muted);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase"><th style="padding:10px 8px 10px 0;font-weight:600">Horário</th><th style="padding:10px 8px;font-weight:600">Dispositivo</th><th style="padding:10px 8px;font-weight:600">Canal</th><th style="padding:10px 8px;font-weight:600">Ação</th><th style="padding:10px 8px;font-weight:600">Resultado</th><th style="padding:10px 0 10px 8px;font-weight:600">Origem</th></tr></thead>
+          <tbody aria-live="polite">
+            <sc-for list="{{ logRows }}" as="l" hint-placeholder-count="5">
+              <tr style="border-top:1px solid var(--au-divider)"><td style="padding:9px 8px 9px 0;font-family:'JetBrains Mono',monospace;color:var(--au-muted)">{{ l.t }}</td><td style="padding:9px 8px;font-weight:600">{{ l.dev }}</td><td style="padding:9px 8px">{{ l.ch }}</td><td style="padding:9px 8px">{{ l.action }}</td><td style="padding:9px 8px">{{ l.result }}</td><td style="padding:9px 0 9px 8px;color:var(--au-muted)">{{ l.origin }}</td></tr>
+            </sc-for>
+          </tbody>
+        </table>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section id="s-det" style="display:flex;flex-direction:column;gap:20px;scroll-margin-top:16px">
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap"><span style="font:600 13px 'JetBrains Mono',monospace;color:var(--au-accent-ink)">07</span><h2 style="margin:0;font-size:24px;font-weight:700;color:var(--au-text-strong)">Detalhes do dispositivo</h2><span style="font-size:14px;color:var(--au-muted)">R12 · R25</span></div>
+  <article aria-label="Detalhes: Módulo iluminação 3 canais" style="background:var(--au-bg);border-radius:22px;padding:24px;box-shadow:8px 8px 18px var(--au-shadow-dark),-8px -8px 18px var(--au-shadow-light);display:flex;flex-direction:column;gap:18px;min-width:0">
+    <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap">
+      <div style="display:flex;flex-direction:column;gap:4px"><h3 style="margin:0;font-size:20px;font-weight:700">Módulo iluminação 3 canais</h3><span style="font-size:13.5px;color:var(--au-muted)">Sala de reunião 1 · Interruptor · Conexão direta</span></div>
+      <span style="font:600 11px 'JetBrains Mono',monospace;color:var(--au-accent-ink);padding:3px 8px;border-radius:999px;box-shadow:inset 2px 2px 4px var(--au-shadow-dark),inset -2px -2px 4px var(--au-shadow-light)">R12</span>
+    </div>
+    <div role="tablist" aria-label="Seções do dispositivo" style="display:flex;gap:8px;flex-wrap:wrap"><sc-for list="{{ tabs }}" as="t" hint-placeholder-count="5"><button role="tab" aria-selected="{{ t.aria }}" onClick="{{ t.pick }}" style="border:none;background:var(--au-bg);border-radius:12px;padding:9px 15px;box-shadow:{{ t.shadow }};font-family:Figtree,sans-serif;font-size:13.5px;font-weight:{{ t.weight }};color:{{ t.color }};cursor:pointer">{{ t.label }}</button></sc-for></div>
+    <div role="tabpanel" style="padding:18px;border-radius:18px;box-shadow:inset 3px 3px 6px var(--au-shadow-dark),inset -3px -3px 6px var(--au-shadow-light);min-height:220px">
+      <sc-if value="{{ tabUso }}" hint-placeholder-val="{{ true }}">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px">
+          <sc-for list="{{ channels }}" as="ch" hint-placeholder-count="3">
+            <div style="padding:14px;border-radius:14px;background:var(--au-bg);box-shadow:4px 4px 9px var(--au-shadow-dark),-4px -4px 9px var(--au-shadow-light);display:flex;align-items:center;gap:12px;opacity:{{ dimOff }}">
+              <div style="flex:1;display:flex;flex-direction:column;gap:3px;min-width:0"><span style="font-size:14.5px;font-weight:600">{{ ch.name }}</span><span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:{{ ch.st.fg }}"><span style="{{ ch.st.dot }}"></span>{{ ch.stateText }}</span></div>
+              <button role="switch" aria-checked="{{ ch.ariaOn }}" aria-label="{{ ch.aria }}" disabled="{{ ch.disabled }}" onClick="{{ ch.toggle }}" style="position:relative;width:62px;height:32px;flex:none;border:none;padding:0;border-radius:16px;background:{{ ch.trackBg }};box-shadow:{{ ch.trackShadow }};cursor:pointer"><span style="position:absolute;top:4px;left:{{ ch.knobLeftSm }};width:24px;height:24px;border-radius:50%;background:var(--au-thumb);box-shadow:2px 2px 5px var(--au-shadow-deep),-1px -1px 3px var(--au-shadow-light);transition:left .22s"></span></button>
+            </div>
+          </sc-for>
+        </div>
+        <p style="margin:14px 0 0;font-size:12.5px;color:var(--au-muted)">Uso cotidiano: somente controles e estado. Endereços, códigos e diagnóstico ficam nas demais abas.</p>
+      </sc-if>
+      <sc-if value="{{ tabCap }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;font-size:13.5px">
+          <div style="display:flex;flex-direction:column;gap:3px"><strong>3 canais liga/desliga</strong><span style="color:var(--au-muted)">switch_1, switch_2, switch_3 · escrita liberada</span></div>
+          <div style="display:flex;flex-direction:column;gap:3px"><strong>Brilho do canal 3</strong><span style="color:var(--au-muted)">bright_value_3 · escrita bloqueada até validação</span></div>
+          <div style="display:flex;flex-direction:column;gap:3px"><strong>Temporizador interno</strong><span style="color:var(--au-muted)">countdown_1 · não mapeado</span></div>
+          <div style="display:flex;flex-direction:column;gap:3px"><strong>Consumo</strong><span style="color:var(--au-muted)">Não suportado pelo equipamento</span></div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ tabCon }}" hint-placeholder-val="{{ false }}">
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;font-size:13px;color:var(--au-muted)">
+          <div style="display:flex;flex-direction:column;gap:3px">Identidade<span style="font:600 13.5px 'JetBrains Mono',monospace;color:var(--au-text)">TY-3CH-8F21A0</span></div>
+          <div style="display:flex;flex-direction:column;gap:3px">Endereço IP<span style="font:600 13.5px 'JetBrains Mono',monospace;color:var(--au-text)">192.168.10.52</span></div>
+          <div style="display:flex;flex-direction:column;gap:3px">MAC<span style="font:600 13.5px 'JetBrains Mono',monospace;color:var(--au-text)">D8:1F:12:8F:21:A0</span></div>
+          <div style="display:flex;flex-direction:column;gap:3px">Protocolo<span style="font:600 13.5px 'JetBrains Mono',monospace;color:var(--au-text)">Local 3.3 · direto</span></div>
+          <div style="display:flex;flex-direction:column;gap:3px">Latência média<span style="font:600 13.5px 'JetBrains Mono',monospace;color:var(--au-text)">14 ms</span></div>
+          <div style="display:flex;flex-direction:column;gap:3px">Credencial<span style="font:600 13.5px 'JetBrains Mono',monospace;color:var(--au-text)">Armazenada · oculta</span></div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ tabHis }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column">
+          <sc-for list="{{ devHistory }}" as="l" hint-placeholder-count="3"><div style="display:flex;gap:14px;padding:8px 0;border-bottom:1px solid var(--au-divider);font-size:13px;flex-wrap:wrap"><span style="font-family:'JetBrains Mono',monospace;color:var(--au-muted)">{{ l.t }}</span><strong style="font-weight:600">{{ l.ch }}</strong><span>{{ l.action }}</span><span style="color:var(--au-muted)">{{ l.result }} · {{ l.origin }}</span></div></sc-for>
+        </div>
+      </sc-if>
+      <sc-if value="{{ tabDia }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><span style="font-size:13px;color:var(--au-muted)">Simular para:</span><sc-for list="{{ diagTargets }}" as="t" hint-placeholder-count="3"><button onClick="{{ t.pick }}" aria-pressed="{{ t.aria }}" style="border:none;background:var(--au-bg);border-radius:10px;padding:7px 12px;box-shadow:{{ t.shadow }};font-family:Figtree,sans-serif;font-size:12.5px;font-weight:{{ t.weight }};color:{{ t.color }};cursor:pointer">{{ t.label }}</button></sc-for>
+            <button onClick="{{ runDiag }}" style="margin-left:auto;border:none;border-radius:12px;padding:9px 16px;background:linear-gradient(180deg,var(--au-accent-hi),var(--au-accent-lo));box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:700 13.5px Figtree,sans-serif;color:var(--au-on-accent);cursor:pointer">Executar diagnóstico</button></div>
+          <ol aria-live="polite" style="margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px">
+            <sc-for list="{{ diagSteps }}" as="d" hint-placeholder-count="4">
+              <li style="padding:12px 14px;border-radius:14px;background:var(--au-bg);box-shadow:4px 4px 9px var(--au-shadow-dark),-4px -4px 9px var(--au-shadow-light);display:flex;gap:10px;align-items:flex-start">
+                <span style="width:26px;height:26px;flex:none;border-radius:50%;box-shadow:inset 2px 2px 4px var(--au-shadow-dark),inset -2px -2px 4px var(--au-shadow-light);display:flex;align-items:center;justify-content:center;font:800 14px Figtree;color:{{ d.color }}">{{ d.glyph }}</span>
+                <div style="display:flex;flex-direction:column;gap:2px;min-width:0"><strong style="font-size:13.5px">{{ d.name }} <span style="font-weight:600;color:{{ d.color }}">{{ d.res }}</span></strong><span style="font-size:12.5px;color:var(--au-muted)">{{ d.detail }}</span></div>
+              </li>
+            </sc-for>
+          </ol>
+          <sc-if value="{{ diag.done }}" hint-placeholder-val="{{ false }}">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px">
+              <div style="padding:14px;border-radius:14px;border:1.5px solid var(--au-shadow-dark);display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--au-muted);font-weight:600">Causa conhecida</span><span style="font-size:14px">{{ diag.cause }}</span></div>
+              <div style="padding:14px;border-radius:14px;border:1.5px solid var(--au-shadow-dark);display:flex;flex-direction:column;gap:4px"><span style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--au-muted);font-weight:600">Próxima ação</span><span style="font-size:14px">{{ diag.next }}</span></div>
+            </div>
+          </sc-if>
+          <sc-if value="{{ diag.idle }}" hint-placeholder-val="{{ true }}"><p style="margin:0;font-size:12.5px;color:var(--au-muted)">O diagnóstico verifica configuração, alcance na rede, autenticação e leitura de estado, nesta ordem, e informa em qual etapa a comunicação falha.</p></sc-if>
+        </div>
+      </sc-if>
+    </div>
+  </article>
+</section>
+
+<section id="s-admin" style="display:flex;flex-direction:column;gap:20px;scroll-margin-top:16px">
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap"><span style="font:600 13px 'JetBrains Mono',monospace;color:var(--au-accent-ink)">08</span><h2 style="margin:0;font-size:24px;font-weight:700;color:var(--au-text-strong)">Administração</h2><span style="font-size:14px;color:var(--au-muted)">R23 · R24 · R26 · R27</span></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,400px),1fr));gap:26px;align-items:start">
+
+    <article aria-label="Cadastro e descoberta" style="background:var(--au-bg);border-radius:22px;padding:22px;box-shadow:8px 8px 18px var(--au-shadow-dark),-8px -8px 18px var(--au-shadow-light);display:flex;flex-direction:column;gap:14px;min-width:0">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><h3 style="margin:0;font-size:17px;font-weight:700">Cadastro e descoberta</h3><span style="font:600 11px 'JetBrains Mono',monospace;color:var(--au-accent-ink);padding:3px 8px;border-radius:999px;box-shadow:inset 2px 2px 4px var(--au-shadow-dark),inset -2px -2px 4px var(--au-shadow-light)">R23</span></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;opacity:{{ dimOff }}">
+        <button disabled="{{ discovering }}" onClick="{{ discover }}" style="border:none;border-radius:12px;padding:9px 14px;background:linear-gradient(180deg,var(--au-accent-hi),var(--au-accent-lo));box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:700 13px Figtree,sans-serif;color:var(--au-on-accent);cursor:pointer">{{ discoverLabel }}</button>
+        <button disabled="{{ off }}" onClick="{{ importAccount }}" style="border:none;background:var(--au-bg);border-radius:12px;padding:9px 14px;box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:600 13px Figtree,sans-serif;color:var(--au-text);cursor:pointer">Importar da conta</button>
+        <button disabled="{{ off }}" onClick="{{ updateIps }}" style="border:none;background:var(--au-bg);border-radius:12px;padding:9px 14px;box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:600 13px Figtree,sans-serif;color:var(--au-text);cursor:pointer">Atualizar IPs pela identidade</button>
+      </div>
+      <div style="padding:14px 16px;border-radius:16px;border:1.5px dashed var(--au-dashed);display:flex;flex-direction:column;gap:8px">
+        <span style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--au-muted);font-weight:600">Descobertos · não autenticados</span>
+        <sc-if value="{{ hasDiscovered }}" hint-placeholder-val="{{ false }}">
+          <sc-for list="{{ discovered }}" as="d" hint-placeholder-count="2">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:6px 0;flex-wrap:wrap">
+              <div style="display:flex;flex-direction:column;gap:2px"><strong style="font-size:13.5px">{{ d.name }}</strong><span style="font-size:12px;color:var(--au-muted)">{{ d.how }} · <span style="font-family:'JetBrains Mono',monospace">{{ d.id }}</span></span></div>
+              <sc-if value="{{ d.isNew }}" hint-placeholder-val="{{ true }}"><button onClick="{{ d.auth }}" style="border:none;background:var(--au-bg);border-radius:10px;padding:7px 12px;box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:600 12.5px Figtree,sans-serif;color:var(--au-text);cursor:pointer">Autenticar e associar</button></sc-if>
+              <sc-if value="{{ d.authing }}" hint-placeholder-val="{{ false }}"><span style="font-size:12.5px;font-weight:600;color:var(--au-warn-ink)">Autenticando…</span></sc-if>
+              <sc-if value="{{ d.isAuth }}" hint-placeholder-val="{{ false }}"><span style="font-size:12.5px;font-weight:600;color:var(--au-ok-ink)">✓ Movido para autenticados</span></sc-if>
+            </div>
+          </sc-for>
+        </sc-if>
+        <sc-if value="{{ discovering }}" hint-placeholder-val="{{ false }}"><span style="font-size:13px;color:var(--au-warn-ink)">Buscando dispositivos na rede local e nos gateways…</span></sc-if>
+      </div>
+      <div style="padding:12px 16px;border-radius:16px;box-shadow:inset 3px 3px 6px var(--au-shadow-dark),inset -3px -3px 6px var(--au-shadow-light);display:flex;justify-content:space-between;font-size:13.5px"><span>Autenticados</span><strong style="font-family:'JetBrains Mono',monospace">{{ authCount }}</strong></div>
+    </article>
+
+    <article aria-label="Configuração das capacidades" style="background:var(--au-bg);border-radius:22px;padding:22px;box-shadow:8px 8px 18px var(--au-shadow-dark),-8px -8px 18px var(--au-shadow-light);display:flex;flex-direction:column;gap:14px;min-width:0">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><h3 style="margin:0;font-size:17px;font-weight:700">Configuração das capacidades</h3><span style="font:600 11px 'JetBrains Mono',monospace;color:var(--au-accent-ink);padding:3px 8px;border-radius:999px;box-shadow:inset 2px 2px 4px var(--au-shadow-dark),inset -2px -2px 4px var(--au-shadow-light)">R24</span></div>
+      <p style="margin:0;font-size:12.5px;color:var(--au-muted)">A escrita só pode ser liberada depois que a leitura do valor for validada.</p>
+      <sc-for list="{{ caps }}" as="c" hint-placeholder-count="3">
+        <div style="padding:12px 14px;border-radius:14px;box-shadow:inset 3px 3px 6px var(--au-shadow-dark),inset -3px -3px 6px var(--au-shadow-light);display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><strong style="font-size:13.5px">{{ c.name }}</strong><span style="font:400 12px 'JetBrains Mono',monospace;color:var(--au-muted)">{{ c.code }}</span></div>
+          <span style="font-size:12.5px;color:var(--au-muted)">{{ c.type }} · {{ c.range }}</span>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;font-size:12.5px;font-weight:600">
+            <span style="color:{{ c.readColor }}">{{ c.readText }}</span><span style="color:{{ c.writeColor }}">{{ c.writeText }}</span>
+            <sc-if value="{{ c.readNo }}" hint-placeholder-val="{{ false }}"><button onClick="{{ c.validate }}" style="margin-left:auto;border:none;background:var(--au-bg);border-radius:10px;padding:6px 11px;box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:600 12px Figtree,sans-serif;color:var(--au-text);cursor:pointer">Validar leitura</button></sc-if>
+            <sc-if value="{{ c.canUnlock }}" hint-placeholder-val="{{ false }}"><button onClick="{{ c.unlock }}" style="margin-left:auto;border:none;background:var(--au-bg);border-radius:10px;padding:6px 11px;box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:600 12px Figtree,sans-serif;color:var(--au-err-ink);cursor:pointer">Liberar escrita</button></sc-if>
+          </div>
+        </div>
+      </sc-for>
+    </article>
+
+    <article aria-label="Gestão de acesso" style="background:var(--au-bg);border-radius:22px;padding:22px;box-shadow:8px 8px 18px var(--au-shadow-dark),-8px -8px 18px var(--au-shadow-light);display:flex;flex-direction:column;gap:14px;min-width:0">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><h3 style="margin:0;font-size:17px;font-weight:700">Gestão de acesso</h3><span style="font:600 11px 'JetBrains Mono',monospace;color:var(--au-accent-ink);padding:3px 8px;border-radius:999px;box-shadow:inset 2px 2px 4px var(--au-shadow-dark),inset -2px -2px 4px var(--au-shadow-light)">R26</span></div>
+      <div style="padding:12px 14px;border-radius:14px;border:1.5px dashed var(--au-dashed);font-size:13px;line-height:1.5"><strong style="color:var(--au-warn-ink)">Acesso restrito a este computador.</strong> Autenticação, sessões e permissões precisam estar ativas antes de liberar o painel para outros computadores ou celulares.</div>
+      <div style="overflow-x:auto;border-radius:14px;box-shadow:inset 3px 3px 6px var(--au-shadow-dark),inset -3px -3px 6px var(--au-shadow-light);padding:4px 14px">
+        <table style="width:100%;border-collapse:collapse;font-size:13px">
+          <thead><tr style="color:var(--au-muted);font-size:11.5px;text-align:center"><th style="text-align:left;padding:9px 0;font-weight:600">Permissão</th><th style="padding:9px 4px;font-weight:600">Visualização</th><th style="padding:9px 4px;font-weight:600">Operação</th><th style="padding:9px 4px;font-weight:600">Administração</th></tr></thead>
+          <tbody><sc-for list="{{ roles }}" as="r" hint-placeholder-count="5"><tr style="border-top:1px solid var(--au-divider);text-align:center"><td style="text-align:left;padding:8px 0">{{ r.p }}</td><td style="font-weight:700;color:var(--au-text)">{{ r.a }}</td><td style="font-weight:700;color:var(--au-text)">{{ r.b }}</td><td style="font-weight:700;color:var(--au-text)">{{ r.c }}</td></tr></sc-for></tbody>
+        </table>
+      </div>
+      <button style="align-self:flex-start;border:none;background:var(--au-bg);border-radius:12px;padding:9px 14px;box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:600 13px Figtree,sans-serif;color:var(--au-text);cursor:pointer">Configurar autenticação</button>
+    </article>
+
+    <article aria-label="Configurações e recuperação" style="background:var(--au-bg);border-radius:22px;padding:22px;box-shadow:8px 8px 18px var(--au-shadow-dark),-8px -8px 18px var(--au-shadow-light);display:flex;flex-direction:column;gap:14px;min-width:0">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><h3 style="margin:0;font-size:17px;font-weight:700">Configurações e recuperação</h3><span style="font:600 11px 'JetBrains Mono',monospace;color:var(--au-accent-ink);padding:3px 8px;border-radius:999px;box-shadow:inset 2px 2px 4px var(--au-shadow-dark),inset -2px -2px 4px var(--au-shadow-light)">R27</span></div>
+      <div style="padding:14px;border-radius:14px;box-shadow:inset 3px 3px 6px var(--au-shadow-dark),inset -3px -3px 6px var(--au-shadow-light);display:flex;flex-direction:column;gap:10px">
+        <span style="font-size:13.5px"><strong>Configuração</strong> · ambientes, nomes, grupos e mapeamentos</span>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button onClick="{{ exportCfg }}" style="border:none;background:var(--au-bg);border-radius:10px;padding:8px 13px;box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:600 12.5px Figtree,sans-serif;color:var(--au-text);cursor:pointer">Exportar</button>
+          <button onClick="{{ restoreCfg }}" style="border:none;background:var(--au-bg);border-radius:10px;padding:8px 13px;box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:600 12.5px Figtree,sans-serif;color:var(--au-text);cursor:pointer">Restaurar</button>
+        </div>
+      </div>
+      <div style="padding:14px;border-radius:14px;box-shadow:inset 3px 3px 6px var(--au-shadow-dark),inset -3px -3px 6px var(--au-shadow-light);display:flex;flex-direction:column;gap:6px">
+        <span style="font-size:13.5px"><strong>Credenciais</strong> · tratadas separadamente</span>
+        <span style="font-size:12.5px;color:var(--au-muted)">Não são incluídas na exportação de configuração. Exportação própria, protegida por senha.</span>
+      </div>
+      <div style="padding:14px;border-radius:14px;box-shadow:inset 3px 3px 6px var(--au-shadow-dark),inset -3px -3px 6px var(--au-shadow-light);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+        <span style="font-size:13.5px"><strong>Serviço local</strong> · reinicialização controlada</span>
+        <button disabled="{{ off }}" onClick="{{ restartSvc }}" style="border:none;background:var(--au-bg);border-radius:10px;padding:8px 13px;box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:600 12.5px Figtree,sans-serif;color:var(--au-err-ink);cursor:pointer;opacity:{{ dimOff }}">Reiniciar serviço</button>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section id="s-modais" style="display:flex;flex-direction:column;gap:20px;scroll-margin-top:16px">
+  <div style="display:flex;align-items:baseline;gap:14px;flex-wrap:wrap"><span style="font:600 13px 'JetBrains Mono',monospace;color:var(--au-accent-ink)">09</span><h2 style="margin:0;font-size:24px;font-weight:700;color:var(--au-text-strong)">Janelas modais</h2><span style="font-size:14px;color:var(--au-muted)">Confirmação, formulário, informação, alerta e painel lateral · R16 · R18 · R21 · R22</span></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,240px),1fr));gap:22px">
+    <sc-for list="{{ modalTypes }}" as="m" hint-placeholder-count="5">
+      <div style="background:var(--au-bg);border-radius:22px;padding:20px;box-shadow:8px 8px 18px var(--au-shadow-dark),-8px -8px 18px var(--au-shadow-light);display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+          <span aria-hidden="true" style="width:40px;height:40px;border-radius:12px;box-shadow:var(--au-inset-sm);display:flex;align-items:center;justify-content:center;color:{{ m.iconColor }}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="{{ m.icon }}"></path></svg></span>
+          <span style="font:600 11px 'JetBrains Mono',monospace;color:var(--au-accent-ink);padding:3px 8px;border-radius:999px;box-shadow:var(--au-inset-sm)">{{ m.tag }}</span>
+        </div>
+        <strong style="font-size:15.5px;color:var(--au-text-strong)">{{ m.title }}</strong>
+        <span style="font-size:13px;line-height:1.5;color:var(--au-muted);flex:1">{{ m.desc }}</span>
+        <button onClick="{{ m.open }}" style="align-self:flex-start;border:none;background:var(--au-bg);border-radius:12px;padding:9px 14px;box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:600 13px Figtree,sans-serif;color:var(--au-text);cursor:pointer">Abrir exemplo</button>
+      </div>
+    </sc-for>
+  </div>
+  <p style="margin:0;font-size:12.5px;color:var(--au-muted)">Todas as janelas fecham com Esc, pelo botão de fechar ou clicando fora. O foco vai para o primeiro campo ou para o botão de fechar ao abrir.</p>
+</section>
+
+</div>
+</main>
+
+<sc-if value="{{ mForm }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ backdropClose }}" style="position:fixed;inset:0;background:var(--au-backdrop);display:flex;align-items:center;justify-content:center;padding:20px;z-index:60">
+    <div role="dialog" aria-modal="true" aria-labelledby="mf-title" style="width:min(560px,100%);max-height:calc(100vh - 40px);overflow:auto;background:var(--au-bg);border-radius:24px;box-shadow:var(--au-modal-shadow);display:flex;flex-direction:column">
+      <header style="display:flex;align-items:flex-start;gap:14px;padding:22px 24px 16px">
+        <span aria-hidden="true" style="width:44px;height:44px;flex:none;border-radius:14px;box-shadow:var(--au-inset-sm);display:flex;align-items:center;justify-content:center;color:var(--au-accent-ink)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 7v5l3 2M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z"></path></svg></span>
+        <div style="flex:1;display:flex;flex-direction:column;gap:3px"><h3 id="mf-title" style="margin:0;font-size:19px;font-weight:700;color:var(--au-text-strong)">Novo agendamento</h3><span style="font-size:13px;color:var(--au-muted)">Executado pelo serviço local no horário definido</span></div>
+        <button aria-label="Fechar" onClick="{{ closeModal }}" style="width:36px;height:36px;flex:none;border:none;border-radius:11px;background:var(--au-bg);box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);color:var(--au-text);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+      </header>
+      <div style="padding:4px 24px 20px;display:flex;flex-direction:column;gap:16px">
+        <label style="display:flex;flex-direction:column;gap:7px;font-size:13px;font-weight:600">Nome do agendamento
+          <input autoFocus="{{ true }}" value="{{ form.name }}" onChange="{{ onFormName }}" placeholder="Ex.: Desligar estúdio" style="height:42px;border:none;border-radius:14px;padding:0 14px;box-shadow:var(--au-inset);background:var(--au-bg);font:500 14px Figtree,sans-serif;color:var(--au-text-strong);outline:none"></input></label>
+        <div style="display:flex;flex-direction:column;gap:7px"><span style="font-size:13px;font-weight:600">Ação</span>
+          <div role="radiogroup" aria-label="Ação" style="display:flex;gap:8px"><sc-for list="{{ formActions }}" as="a" hint-placeholder-count="2"><button role="radio" aria-checked="{{ a.aria }}" onClick="{{ a.pick }}" style="flex:1;border:none;background:var(--au-bg);border-radius:12px;padding:10px;box-shadow:{{ a.shadow }};font-family:Figtree,sans-serif;font-size:13.5px;font-weight:{{ a.weight }};color:{{ a.color }};cursor:pointer">{{ a.label }}</button></sc-for></div>
+        </div>
+        <div style="display:grid;grid-template-columns:minmax(0,1fr) 140px;gap:14px">
+          <label style="display:flex;flex-direction:column;gap:7px;font-size:13px;font-weight:600">Dispositivo ou grupo
+            <select value="{{ form.target }}" onChange="{{ onFormTarget }}" style="appearance:none;height:42px;border:none;border-radius:14px;padding:0 14px;background:var(--au-bg);box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:600 13.5px Figtree,sans-serif;color:var(--au-text);cursor:pointer"><sc-for list="{{ formTargets }}" as="o" hint-placeholder-count="4"><option value="{{ o.v }}">{{ o.v }}</option></sc-for></select></label>
+          <label style="display:flex;flex-direction:column;gap:7px;font-size:13px;font-weight:600">Horário
+            <input type="time" value="{{ form.time }}" onChange="{{ onFormTime }}" style="height:42px;border:none;border-radius:14px;padding:0 12px;box-shadow:var(--au-inset);background:var(--au-bg);font:600 14px 'JetBrains Mono',monospace;color:var(--au-text-strong);outline:none"></input></label>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:7px"><span style="font-size:13px;font-weight:600">Dias da semana</span>
+          <div style="display:flex;gap:6px;flex-wrap:wrap"><sc-for list="{{ formDays }}" as="d" hint-placeholder-count="7"><button aria-pressed="{{ d.aria }}" onClick="{{ d.toggle }}" style="width:46px;height:38px;border:none;background:var(--au-bg);border-radius:11px;box-shadow:{{ d.shadow }};font-family:Figtree,sans-serif;font-size:12.5px;font-weight:{{ d.weight }};color:{{ d.color }};cursor:pointer">{{ d.label }}</button></sc-for></div>
+        </div>
+        <sc-if value="{{ form.hasErr }}" hint-placeholder-val="{{ false }}"><p role="alert" style="margin:0;font-size:13px;font-weight:600;color:var(--au-err-ink)">{{ form.err }}</p></sc-if>
+      </div>
+      <footer style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:16px 24px 22px;border-top:1px solid var(--au-divider)">
+        <span style="font-size:12.5px;color:var(--au-muted)">Requer o serviço local em funcionamento.</span>
+        <div style="display:flex;gap:10px">
+          <button onClick="{{ closeModal }}" style="border:none;background:var(--au-bg);border-radius:12px;padding:10px 18px;box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:600 14px Figtree,sans-serif;color:var(--au-text);cursor:pointer">Cancelar</button>
+          <button onClick="{{ saveForm }}" style="border:none;border-radius:12px;padding:10px 18px;background:linear-gradient(180deg,var(--au-accent-hi),var(--au-accent-lo));box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:700 14px Figtree,sans-serif;color:var(--au-on-accent);cursor:pointer">Salvar agendamento</button>
+        </div>
+      </footer>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ mInfo }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ backdropClose }}" style="position:fixed;inset:0;background:var(--au-backdrop);display:flex;align-items:center;justify-content:center;padding:20px;z-index:60">
+    <div role="dialog" aria-modal="true" aria-labelledby="mi-title" style="width:min(600px,100%);max-height:calc(100vh - 40px);overflow:auto;background:var(--au-bg);border-radius:24px;box-shadow:var(--au-modal-shadow);display:flex;flex-direction:column">
+      <header style="display:flex;align-items:flex-start;gap:14px;padding:22px 24px 16px">
+        <span aria-hidden="true" style="width:44px;height:44px;flex:none;border-radius:14px;box-shadow:var(--au-inset-sm);display:flex;align-items:center;justify-content:center;color:var(--au-accent-ink)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h16v6H4zM8 17h.01M12 14V9M8.5 7.5a5 5 0 0 1 7 0M6 5a8.5 8.5 0 0 1 12 0"></path></svg></span>
+        <div style="flex:1;display:flex;flex-direction:column;gap:3px"><h3 id="mi-title" style="margin:0;font-size:19px;font-weight:700;color:var(--au-text-strong)">Gateway Zigbee 01</h3><span style="display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:{{ gwOk.fg }}"><span style="{{ gwOk.dot }}"></span>Disponível · 192.168.10.40</span></div>
+        <button autoFocus="{{ true }}" aria-label="Fechar" onClick="{{ closeModal }}" style="width:36px;height:36px;flex:none;border:none;border-radius:11px;background:var(--au-bg);box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);color:var(--au-text);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+      </header>
+      <div style="padding:4px 24px 20px;display:flex;flex-direction:column;gap:16px">
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px">
+          <div style="padding:12px 14px;border-radius:14px;box-shadow:var(--au-inset);display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--au-muted)">Vinculados<strong style="font:600 18px 'JetBrains Mono',monospace;color:var(--au-text-strong)">5</strong></div>
+          <div style="padding:12px 14px;border-radius:14px;box-shadow:var(--au-inset);display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--au-muted)">Respondendo<strong style="font:600 18px 'JetBrains Mono',monospace;color:var(--au-text-strong)">3 de 5</strong></div>
+          <div style="padding:12px 14px;border-radius:14px;box-shadow:var(--au-inset);display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--au-muted)">Último contato<strong style="font:600 18px 'JetBrains Mono',monospace;color:var(--au-text-strong)">{{ lastUpdate }}</strong></div>
+        </div>
+        <div style="display:flex;flex-direction:column;border-radius:16px;box-shadow:var(--au-inset);padding:4px 16px">
+          <sc-for list="{{ gw1Children }}" as="c" hint-placeholder-count="4">
+            <div style="display:flex;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid var(--au-divider);font-size:13.5px;flex-wrap:wrap"><div style="display:flex;flex-direction:column;gap:2px"><strong style="font-weight:600">{{ c.name }}</strong><span style="font-size:12px;color:var(--au-muted)">{{ c.room }}</span></div><span style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:{{ c.st.fg }}"><span style="{{ c.st.dot }}"></span>{{ c.st.label }}</span></div>
+          </sc-for>
+        </div>
+      </div>
+      <footer style="display:flex;justify-content:flex-end;gap:10px;padding:16px 24px 22px;border-top:1px solid var(--au-divider)">
+        <button onClick="{{ infoToDiag }}" style="border:none;background:var(--au-bg);border-radius:12px;padding:10px 18px;box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:600 14px Figtree,sans-serif;color:var(--au-text);cursor:pointer">Abrir diagnóstico</button>
+        <button onClick="{{ closeModal }}" style="border:none;border-radius:12px;padding:10px 18px;background:linear-gradient(180deg,var(--au-accent-hi),var(--au-accent-lo));box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:700 14px Figtree,sans-serif;color:var(--au-on-accent);cursor:pointer">Fechar</button>
+      </footer>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ mAlert }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ backdropClose }}" style="position:fixed;inset:0;background:var(--au-backdrop);display:flex;align-items:center;justify-content:center;padding:20px;z-index:60">
+    <div role="alertdialog" aria-modal="true" aria-labelledby="ma-title" aria-describedby="ma-desc" style="width:min(480px,100%);background:var(--au-bg);border-radius:24px;box-shadow:var(--au-modal-shadow),0 0 0 2px var(--au-err);display:flex;flex-direction:column">
+      <header style="display:flex;align-items:flex-start;gap:14px;padding:22px 24px 14px">
+        <span aria-hidden="true" style="width:44px;height:44px;flex:none;border-radius:14px;box-shadow:var(--au-inset-sm);display:flex;align-items:center;justify-content:center;color:var(--au-err-ink)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4l9 16H3zM12 10v4M12 17h.01"></path></svg></span>
+        <div style="flex:1;display:flex;flex-direction:column;gap:3px"><span style="font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--au-err-ink)">Alerta · severidade alta</span><h3 id="ma-title" style="margin:0;font-size:19px;font-weight:700;color:var(--au-text-strong)">Gateway Zigbee 02 indisponível</h3></div>
+        <button aria-label="Fechar" onClick="{{ closeModal }}" style="width:36px;height:36px;flex:none;border:none;border-radius:11px;background:var(--au-bg);box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);color:var(--au-text);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+      </header>
+      <div id="ma-desc" style="padding:0 24px 20px;display:flex;flex-direction:column;gap:12px">
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:8px 16px;padding:14px 16px;border-radius:14px;box-shadow:var(--au-inset);font-size:13.5px">
+          <span style="color:var(--au-muted)">Desde</span><strong style="font-weight:600">14:12 · há 18 min</strong>
+          <span style="color:var(--au-muted)">Afetados</span><strong style="font-weight:600">Sensor de chuva e mais 2 dispositivos</strong>
+          <span style="color:var(--au-muted)">Causa provável</span><span>Sem resposta em 192.168.10.41 após 3 tentativas</span>
+          <span style="color:var(--au-muted)">Próxima ação</span><span>Verifique a alimentação do gateway e o cabo de rede</span>
+        </div>
+        <span style="font-size:12.5px;color:var(--au-muted)">Os dispositivos afetados exibem o último valor conhecido até a reconexão.</span>
+      </div>
+      <footer style="display:flex;justify-content:flex-end;gap:10px;padding:16px 24px 22px;border-top:1px solid var(--au-divider)">
+        <button onClick="{{ alertSilence }}" style="border:none;background:var(--au-bg);border-radius:12px;padding:10px 18px;box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:600 14px Figtree,sans-serif;color:var(--au-text);cursor:pointer">Silenciar 1 h</button>
+        <button autoFocus="{{ true }}" onClick="{{ alertAck }}" style="border:none;border-radius:12px;padding:10px 18px;background:linear-gradient(180deg,var(--au-accent-hi),var(--au-accent-lo));box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:700 14px Figtree,sans-serif;color:var(--au-on-accent);cursor:pointer">Reconhecer</button>
+      </footer>
+    </div>
+  </div>
+</sc-if>
+
+<sc-if value="{{ mDrawer }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ backdropClose }}" style="position:fixed;inset:0;background:var(--au-backdrop);display:flex;justify-content:flex-end;z-index:60">
+    <aside role="dialog" aria-modal="true" aria-labelledby="md-title" style="width:min(420px,100%);height:100%;box-sizing:border-box;background:var(--au-bg);box-shadow:-10px 0 30px var(--au-shadow-dark);border-radius:24px 0 0 24px;display:flex;flex-direction:column;overflow:auto">
+      <header style="display:flex;align-items:flex-start;gap:14px;padding:24px 24px 16px">
+        <div style="flex:1;display:flex;flex-direction:column;gap:3px"><span style="font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--au-muted);font-weight:600">Painel lateral</span><h3 id="md-title" style="margin:0;font-size:19px;font-weight:700;color:var(--au-text-strong)">Editar canal</h3><span style="font-size:13px;color:var(--au-muted)">Módulo iluminação 3 canais</span></div>
+        <button aria-label="Fechar" onClick="{{ closeModal }}" style="width:36px;height:36px;flex:none;border:none;border-radius:11px;background:var(--au-bg);box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);color:var(--au-text);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+      </header>
+      <div style="padding:4px 24px 20px;display:flex;flex-direction:column;gap:18px;flex:1">
+        <div style="display:flex;flex-direction:column;gap:7px"><span style="font-size:13px;font-weight:600">Canal</span>
+          <div role="radiogroup" aria-label="Canal" style="display:flex;flex-direction:column;gap:8px"><sc-for list="{{ drawerChannels }}" as="c" hint-placeholder-count="3"><button role="radio" aria-checked="{{ c.aria }}" onClick="{{ c.pick }}" style="display:flex;justify-content:space-between;align-items:center;border:none;background:var(--au-bg);border-radius:12px;padding:11px 14px;box-shadow:{{ c.shadow }};font-family:Figtree,sans-serif;font-size:13.5px;font-weight:{{ c.weight }};color:{{ c.color }};cursor:pointer;text-align:left">{{ c.label }}<span style="font:400 11.5px 'JetBrains Mono',monospace;color:var(--au-muted)">{{ c.code }}</span></button></sc-for></div>
+        </div>
+        <label style="display:flex;flex-direction:column;gap:7px;font-size:13px;font-weight:600">Nome exibido
+          <input autoFocus="{{ true }}" value="{{ drawer.name }}" onChange="{{ onDrawerName }}" style="height:42px;border:none;border-radius:14px;padding:0 14px;box-shadow:var(--au-inset);background:var(--au-bg);font:500 14px Figtree,sans-serif;color:var(--au-text-strong);outline:none"></input></label>
+        <div style="padding:14px 16px;border-radius:14px;border:1.5px dashed var(--au-dashed);display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--au-muted)">Identidade técnica (não muda)<span style="font:600 13px 'JetBrains Mono',monospace;color:var(--au-text)">TY-3CH-8F21A0 · {{ drawer.code }}</span></div>
+        <sc-if value="{{ drawer.hasErr }}" hint-placeholder-val="{{ false }}"><p role="alert" style="margin:0;font-size:13px;font-weight:600;color:var(--au-err-ink)">{{ drawer.err }}</p></sc-if>
+      </div>
+      <footer style="display:flex;justify-content:flex-end;gap:10px;padding:16px 24px 24px;border-top:1px solid var(--au-divider)">
+        <button onClick="{{ closeModal }}" style="border:none;background:var(--au-bg);border-radius:12px;padding:10px 18px;box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:600 14px Figtree,sans-serif;color:var(--au-text);cursor:pointer">Cancelar</button>
+        <button onClick="{{ saveDrawer }}" style="border:none;border-radius:12px;padding:10px 18px;background:linear-gradient(180deg,var(--au-accent-hi),var(--au-accent-lo));box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:700 14px Figtree,sans-serif;color:var(--au-on-accent);cursor:pointer">Salvar nome</button>
+      </footer>
+    </aside>
+  </div>
+</sc-if>
+<sc-if value="{{ confirmOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;background:var(--au-backdrop);display:flex;align-items:center;justify-content:center;padding:20px;z-index:50">
+    <div role="dialog" aria-modal="true" aria-labelledby="cf-title" style="width:min(460px,100%);background:var(--au-bg);border-radius:24px;padding:26px;box-shadow:var(--au-modal-shadow);display:flex;flex-direction:column;gap:16px">
+      <h3 id="cf-title" style="margin:0;font-size:19px;font-weight:700;color:var(--au-text-strong)">{{ confirm.title }}</h3>
+      <div style="display:grid;grid-template-columns:auto 1fr;gap:8px 16px;padding:14px 16px;border-radius:14px;box-shadow:inset 3px 3px 6px var(--au-shadow-dark),inset -3px -3px 6px var(--au-shadow-light);font-size:14px">
+        <span style="color:var(--au-muted)">Equipamento</span><strong>{{ confirm.device }}</strong>
+        <span style="color:var(--au-muted)">Função</span><strong>{{ confirm.func }}</strong>
+      </div>
+      <p style="margin:0;font-size:14px;line-height:1.5;color:var(--au-muted)">{{ confirm.detail }}</p>
+      <div style="display:flex;justify-content:flex-end;gap:12px">
+        <button onClick="{{ cancelConfirm }}" style="border:none;background:var(--au-bg);border-radius:12px;padding:10px 18px;box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:600 14px Figtree,sans-serif;color:var(--au-text);cursor:pointer">Cancelar</button>
+        <button onClick="{{ okConfirm }}" style="border:none;border-radius:12px;padding:10px 18px;background:linear-gradient(180deg,var(--au-accent-hi),var(--au-accent-lo));box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:700 14px Figtree,sans-serif;color:var(--au-on-accent);cursor:pointer">{{ confirm.okLabel }}</button>
+      </div>
+    </div>
+  </div>
+</sc-if>
+<sc-if value="{{ scenePreviewOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;background:var(--au-backdrop);display:flex;align-items:center;justify-content:center;padding:20px;z-index:50">
+    <div role="dialog" aria-modal="true" aria-labelledby="sp-title" style="width:min(500px,100%);background:var(--au-bg);border-radius:24px;padding:26px;box-shadow:var(--au-modal-shadow);display:flex;flex-direction:column;gap:16px">
+      <h3 id="sp-title" style="margin:0;font-size:19px;font-weight:700;color:var(--au-text-strong)">Executar cena “{{ scenePreview.name }}”</h3>
+      <p style="margin:0;font-size:14px;color:var(--au-muted)">{{ scenePreview.count }} dispositivos serão afetados:</p>
+      <div style="display:flex;flex-direction:column;gap:2px;padding:8px 16px;border-radius:14px;box-shadow:inset 3px 3px 6px var(--au-shadow-dark),inset -3px -3px 6px var(--au-shadow-light)">
+        <sc-for list="{{ scenePreview.items }}" as="it" hint-placeholder-count="5">
+          <div style="display:flex;justify-content:space-between;gap:12px;padding:8px 0;font-size:14px;border-bottom:1px solid var(--au-divider)"><span>{{ it.dev }}</span><strong style="font-weight:600">{{ it.act }}</strong></div>
+        </sc-for>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:12px">
+        <button onClick="{{ closeScenePreview }}" style="border:none;background:var(--au-bg);border-radius:12px;padding:10px 18px;box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:600 14px Figtree,sans-serif;color:var(--au-text);cursor:pointer">Cancelar</button>
+        <button onClick="{{ runScenePreview }}" style="border:none;border-radius:12px;padding:10px 18px;background:linear-gradient(180deg,var(--au-accent-hi),var(--au-accent-lo));box-shadow:3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light);font:700 14px Figtree,sans-serif;color:var(--au-on-accent);cursor:pointer">Executar cena</button>
+      </div>
+    </div>
+  </div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;claro&quot;,&quot;escuro&quot;,&quot;sistema&quot;],&quot;default&quot;:&quot;claro&quot;,&quot;tsType&quot;:&quot;'claro'|'escuro'|'sistema'&quot;,&quot;section&quot;:&quot;Tema&quot;},&quot;accent&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;ciano&quot;,&quot;verde&quot;,&quot;ambar&quot;,&quot;violeta&quot;,&quot;azul&quot;],&quot;default&quot;:&quot;ciano&quot;,&quot;tsType&quot;:&quot;'ciano'|'verde'|'ambar'|'violeta'|'azul'&quot;,&quot;section&quot;:&quot;Tema&quot;},&quot;latencyMs&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:900,&quot;min&quot;:200,&quot;max&quot;:3000,&quot;step&quot;:100,&quot;unit&quot;:&quot;ms&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Simulação&quot;},&quot;simulateFailures&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Simulação&quot;},&quot;confirmSensitive&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Comportamento&quot;}}">
+const dot = (o) => Object.assign({ width: 10, height: 10, flex: 'none', boxSizing: 'border-box', display: 'inline-block' }, o);
+const ST = {
+  ok: { label: 'Conectado', fg: 'var(--au-ok-ink)', dot: dot({ borderRadius: '50%', background: 'var(--au-ok)' }) },
+  noresp: { label: 'Sem resposta', fg: 'var(--au-err-ink)', dot: dot({ borderRadius: '50%', border: '2px solid var(--au-err)' }) },
+  waiting: { label: 'Aguardando evento', fg: 'var(--au-info-ink)', dot: dot({ borderRadius: '50%', border: '2px dashed var(--au-info)' }) },
+  pending: { label: 'Configuração pendente', fg: 'var(--au-warn-ink)', dot: dot({ borderRadius: 2, background: 'var(--au-warn)' }) },
+  auth: { label: 'Erro de autenticação', fg: 'var(--au-err-ink)', dot: dot({ width: 9, height: 9, borderRadius: 1, background: 'var(--au-err)', transform: 'rotate(45deg)' }) },
+  stale: { label: 'Desatualizado', fg: 'var(--au-muted)', dot: dot({ borderRadius: '50%', border: '1.5px solid var(--au-stale)', background: 'linear-gradient(90deg,var(--au-stale) 50%,transparent 50%)' }) },
+};
+const CMD = {
+  confirmed: { label: 'Confirmado', fg: 'var(--au-ok-ink)', dot: dot({ borderRadius: '50%', background: 'var(--au-ok)' }) },
+  pending: { label: 'Enviando…', fg: 'var(--au-warn-ink)', dot: dot({ borderRadius: '50%', border: '2px solid var(--au-warn)', borderTopColor: 'transparent', animation: 'dcspin .8s linear infinite' }) },
+  unconfirmed: { label: 'Não confirmado', fg: 'var(--au-err-ink)', dot: dot({ borderRadius: '50%', border: '2px solid var(--au-err)' }) },
+  sent: { label: 'Enviado · sem retorno de estado', fg: 'var(--au-info-ink)', dot: dot({ borderRadius: '50%', border: '2px dashed var(--au-info)' }) },
+};
+const RES = {
+  ok: { label: 'Confirmado', fg: 'var(--au-ok-ink)', dot: CMD.confirmed.dot },
+  pending: { label: 'Enviando…', fg: 'var(--au-warn-ink)', dot: CMD.pending.dot },
+  fail: { label: 'Falhou', fg: 'var(--au-err-ink)', dot: CMD.unconfirmed.dot },
+  skip: { label: 'Não enviado', fg: 'var(--au-warn-ink)', dot: ST.pending.dot },
+  sent: { label: 'Enviado', fg: 'var(--au-info-ink)', dot: CMD.sent.dot },
+};
+const now = () => new Date().toLocaleTimeString('pt-BR', { hour12: false });
+const num = (v) => (+v).toLocaleString('pt-BR', { maximumFractionDigits: 1 });
+const fmt = (v, u) => num(v) + (u === '%' || !u ? (u || '') : ' ' + u);
+const RAISED = '4px 4px 9px var(--au-shadow-dark),-4px -4px 9px var(--au-shadow-light)';
+const INSET = 'inset 3px 3px 6px var(--au-shadow-dark),inset -3px -3px 6px var(--au-shadow-light)';
+const segItem = (label, on, pick, disabled) => ({ label, pick, disabled, aria: on ? 'true' : 'false', shadow: on ? INSET : '3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light)', color: on ? 'var(--au-accent-ink)' : 'var(--au-text)', weight: on ? 700 : 600 });
+
+const NAV = [
+  ['s-top', 'Visão geral', 'M4 11l8-7 8 7v9h-5v-6h-6v6H4z'],
+  ['s-fund', 'Fundamentos', 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z'],
+  ['s-disp', 'Dispositivos', 'M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.8.8 1 1.5 1 2.5h6c0-1 .2-1.7 1-2.5A6 6 0 0 0 12 3z'],
+  ['s-ajuste', 'Clima e cortinas', 'M14 14.8V5a2 2 0 0 0-4 0v9.8a4 4 0 1 0 4 0z'],
+  ['s-cenas', 'Cenas e agenda', 'M12 7v5l3 2M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z'],
+  ['s-amb', 'Ambientes', 'M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z'],
+  ['s-hist', 'Histórico e alertas', 'M6 16v-5a6 6 0 1 1 12 0v5l2 2H4zM10 20a2 2 0 0 0 4 0'],
+  ['s-det', 'Diagnóstico', 'M3 12h4l3-8 4 16 3-8h4'],
+  ['s-admin', 'Administração', 'M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M14 4v4M8 10v4M16 16v4'],
+  ['s-modais', 'Janelas modais', 'M4 5h16v14H4zM4 9h16'],
+];
+const DAYS = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
+
+class Component extends DCLogic {
+  state = {
+    sideOpen: true, active: 's-top', modal: null,
+    form: { name: '', action: 'Desligar', target: 'Grupo Iluminação Ala Norte', time: '19:00', days: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex'], err: '' },
+    drawer: { ch: 'c2', name: 'Bancada', err: '' },
+    online: true, ops: 0, lastUpdate: now(),
+    basePower: true, baseCheck: true, baseRadio: 'Cards',
+    channels: [
+      { id: 'c1', name: 'Luz principal', on: true, status: 'confirmed', at: now() },
+      { id: 'c2', name: 'Bancada', on: false, status: 'confirmed', at: now() },
+      { id: 'c3', name: 'Iluminação indireta', on: false, status: 'confirmed', at: now(), fails: true },
+    ],
+    sl: {
+      bright: { v: 64, min: 0, max: 100, step: 1, unit: '%', sent: 64, sentAt: '', count: 0, dev: 'Dimmer estúdio', label: 'Brilho' },
+      temp: { v: 22, min: 16, max: 30, step: 0.5, unit: '°C', sent: 22, sentAt: '', count: 0, dev: 'Fancoil escritório', label: 'Temperatura desejada' },
+      curtain: { v: 40, min: 0, max: 100, step: 5, unit: '%', sent: 40, sentAt: '', count: 0, dev: 'Persiana estúdio', label: 'Posição' },
+    },
+    dragging: null, numInput: '22', numError: '',
+    gwOpen: null,
+    climate: { power: true, set: 23, mode: 'Frio', fan: 'Auto', osc: false, pending: false, sentAt: '14:28:40', last: 'Ligar · 23 °C · Frio' },
+    cmove: null, sala1Curtain: { pending: false, last: 'Fechar · 13:05:12' },
+    actions: [
+      { id: 'a1', group: 'Painel de cenas · escritório', label: 'Cena Apresentação', st: 'tested', res: null },
+      { id: 'a2', group: 'Painel de cenas · escritório', label: 'Cena Vídeo', st: 'tested', res: null },
+      { id: 'a3', group: 'Painel de cenas · escritório', label: 'Cena Limpeza', st: 'mapped', res: null },
+      { id: 'a4', group: 'Painel de cenas · escritório', label: 'Botão 4', st: 'unmapped', res: null },
+      { id: 'i1', group: 'Projetor sala 1 · infravermelho', label: 'Ligar', st: 'tested', res: null },
+      { id: 'i2', group: 'Projetor sala 1 · infravermelho', label: 'Entrada HDMI 1', st: 'tested', res: null },
+      { id: 'i3', group: 'Projetor sala 1 · infravermelho', label: 'Congelar imagem', st: 'mapped', res: null },
+    ],
+    group: { running: false, results: null, members: [
+      { name: 'Luz principal · Sala de reunião 1', outcome: 'ok' },
+      { name: 'Bancada · Sala de reunião 1', outcome: 'ok' },
+      { name: 'Iluminação indireta · Sala de reunião 1', outcome: 'ok' },
+      { name: 'Luminária corredor', outcome: 'skip', reason: 'Configuração pendente' },
+      { name: 'Relé bancada técnica', outcome: 'fail', reason: 'Sem resposta' },
+    ] },
+    scenes: [
+      { id: 's1', name: 'Reunião', desc: 'Prepara a sala de reunião 1', items: [
+        { dev: 'Luz principal', act: 'Ligar' }, { dev: 'Bancada', act: 'Desligar' }, { dev: 'Iluminação indireta', act: 'Ligar' },
+        { dev: 'Ar-condicionado sala 1', act: 'Ligar · 23 °C · Frio', ir: true }, { dev: 'Cortina sala 1', act: 'Fechar', ir: true }] },
+      { id: 's2', name: 'Encerrar expediente', desc: 'Desliga iluminação e climatização', items: [
+        { dev: 'Luz principal', act: 'Desligar' }, { dev: 'Bancada', act: 'Desligar' }, { dev: 'Iluminação indireta', act: 'Desligar' },
+        { dev: 'Luminária corredor', act: 'Desligar', skip: true }, { dev: 'Relé bancada técnica', act: 'Desligar', fail: true }, { dev: 'Ar-condicionado sala 1', act: 'Desligar', ir: true }] },
+    ],
+    scenePreview: null, sceneRes: {},
+    schedules: [
+      { id: 'h1', name: 'Desligar iluminação Ala Norte', when: 'Seg–Sex · 19:00', next: 'Hoje, 19:00', st: 'active' },
+      { id: 'h2', name: 'Abrir persiana estúdio', when: 'Seg–Sex · 08:00', next: 'Amanhã, 08:00', st: 'active' },
+      { id: 'h3', name: 'Temporizador · desligar ar-condicionado sala 1', when: 'Uma vez · em 45 min', next: 'Hoje, 15:20', st: 'paused' },
+    ],
+    room: 'Todos', query: '', fType: 'Todos', fGw: 'Todos', fFav: false, fCtrl: false, fProb: false,
+    devices: [
+      { id: 'TY-3CH-8F21A0', name: 'Módulo iluminação 3 canais', room: 'Sala de reunião 1', type: 'Interruptor', via: 'Direto', avail: 'ok', ctrl: true, fav: true, groups: ['Ala Norte'] },
+      { id: 'ZB-TH-01C4', name: 'Sensor temperatura e umidade', room: 'Escritório', type: 'Sensor', via: 'Gateway Zigbee 01', avail: 'ok', ctrl: false, fav: false, groups: [] },
+      { id: 'IR-AC-S1', name: 'Ar-condicionado sala 1', room: 'Sala de reunião 1', type: 'Climatização', via: 'Hub IR escritório', avail: 'ok', ctrl: true, fav: true, groups: [] },
+      { id: 'TY-CUR-3310', name: 'Persiana estúdio', room: 'Estúdio', type: 'Cortina', via: 'Direto', avail: 'ok', ctrl: true, fav: false, groups: [] },
+      { id: 'ZB-DOOR-0A7', name: 'Sensor de abertura', room: 'Corredor', type: 'Sensor', via: 'Gateway Zigbee 01', avail: 'waiting', ctrl: false, fav: false, groups: [] },
+      { id: 'TY-RLY-2B90', name: 'Relé bancada técnica', room: 'Estúdio', type: 'Relé', via: 'Direto', avail: 'noresp', ctrl: true, fav: false, groups: ['Ala Norte'] },
+      { id: 'TY-PNL-4B12', name: 'Painel de cenas 4 botões', room: 'Escritório', type: 'Painel', via: 'Direto', avail: 'auth', ctrl: true, fav: false, groups: [] },
+      { id: 'ZB-PIR-0915', name: 'Sensor de presença', room: 'Sala de reunião 1', type: 'Sensor', via: 'Gateway Zigbee 01', avail: 'ok', ctrl: false, fav: true, groups: [] },
+      { id: 'ZB-LUM-22E0', name: 'Luminária corredor', room: 'Corredor', type: 'Iluminação', via: 'Gateway Zigbee 01', avail: 'pending', ctrl: true, fav: false, groups: ['Ala Norte'] },
+      { id: 'ZB-RAIN-0412', name: 'Sensor de chuva', room: 'Cobertura', type: 'Sensor', via: 'Gateway Zigbee 02', avail: 'stale', ctrl: false, fav: false, groups: [] },
+    ],
+    favs: [
+      { id: 'f1', label: 'Luz principal', sub: 'Função · Sala de reunião 1, canal 1' },
+      { id: 'f2', label: 'Ar-condicionado sala 1', sub: 'Dispositivo · Climatização' },
+      { id: 'f3', label: 'Cena Reunião', sub: 'Cena · 5 ações' },
+      { id: 'f4', label: 'Sensor de presença', sub: 'Dispositivo · Sala de reunião 1' },
+    ],
+    period: '24h',
+    log: [
+      { t: '14:31:58', dev: 'Módulo iluminação 3 canais', ch: 'Luz principal', action: 'Ligar', result: 'Confirmado', origin: 'Cena Reunião' },
+      { t: '14:12:40', dev: 'Gateway Zigbee 02', ch: '—', action: 'Conectividade', result: 'Indisponível', origin: 'Sistema' },
+      { t: '13:05:12', dev: 'Cortina sala 1', ch: 'IR', action: 'Fechar', result: 'Enviado · sem confirmação', origin: 'Agendamento' },
+      { t: '12:31:07', dev: 'Relé bancada técnica', ch: 'Canal 1', action: 'Ligar', result: 'Confirmado', origin: 'Painel web · operador' },
+    ],
+    alerts: [
+      { id: 'al1', sev: 'Alta', title: 'Gateway Zigbee 02 indisponível', detail: 'Sem resposta há 18 min · 3 dispositivos afetados', time: '14:12', st: 'open' },
+      { id: 'al2', sev: 'Média', title: 'Bateria baixa · Sensor de abertura', detail: 'Corredor · 12%', time: '11:40', st: 'open' },
+      { id: 'al3', sev: 'Média', title: 'Perda prolongada de comunicação', detail: 'Relé bancada técnica · último contato 12:31', time: '13:31', st: 'open' },
+      { id: 'al4', sev: 'Baixa', title: 'Temperatura acima do limite', detail: 'Escritório · 26,4 °C (limite definido: 26 °C)', time: '10:02', st: 'ack' },
+    ],
+    tab: 'Uso',
+    diagTarget: 'mod', diagStep: -1,
+    discovering: false, discovered: null, authCount: 10,
+    caps: [
+      { id: 'k1', name: 'Canal 1 · Luz principal', code: 'switch_1', type: 'Liga/desliga', range: 'true / false', read: 'ok', write: 'ok' },
+      { id: 'k2', name: 'Canal 3 · brilho', code: 'bright_value_3', type: 'Valor contínuo', range: '10–1000 → 0–100 %', read: 'no', write: 'locked' },
+      { id: 'k3', name: 'Potência instantânea', code: 'cur_power', type: 'Somente leitura', range: '÷10 → W', read: 'no', write: 'na' },
+    ],
+  };
+  timers = [];
+  kt = {};
+  rects = {};
+  componentDidMount() {
+    if (window.innerWidth < 900) this.setState({ sideOpen: false });
+    this.onKey = (e) => { if (e.key === 'Escape' && (this.state.modal || this.state.confirm || this.state.scenePreview)) this.setState({ modal: null, confirm: null, scenePreview: null }); };
+    this.onScroll = () => {
+      let cur = 's-top';
+      for (const n of NAV) { const el = document.getElementById(n[0]); if (el && el.getBoundingClientRect().top < 140) cur = n[0]; }
+      if (cur !== this.state.active) this.setState({ active: cur });
+    };
+    window.addEventListener('keydown', this.onKey); window.addEventListener('scroll', this.onScroll, { passive: true });
+  }
+  componentWillUnmount() { this.timers.forEach(clearTimeout); clearInterval(this.civ); clearInterval(this.div); window.removeEventListener('keydown', this.onKey); window.removeEventListener('scroll', this.onScroll); }
+  goTo(id) { const el = document.getElementById(id); if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 16, behavior: 'smooth' }); this.setState({ active: id }); }
+  openModal(k) {
+    if (k === 'form') this.setState({ form: { name: '', action: 'Desligar', target: 'Grupo Iluminação Ala Norte', time: '19:00', days: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex'], err: '' } });
+    if (k === 'drawer') { const c = this.state.channels[1]; this.setState({ drawer: { ch: c.id, name: c.name, err: '' } }); }
+    this.setState({ modal: k });
+  }
+  componentDidUpdate(pp) { if (pp.theme !== this.props.theme && this.state.themeMode) this.setState({ themeMode: null }); }
+  lat() { return this.props.latencyMs ?? 900; }
+  fails() { return this.props.simulateFailures ?? true; }
+  later(fn, ms) { this.timers.push(setTimeout(fn, ms ?? this.lat())); }
+  log(dev, ch, action, result, origin) {
+    this.setState(s => ({ lastUpdate: now(), log: [{ t: now(), dev, ch, action, result, origin: origin || 'Painel web · operador' }, ...s.log].slice(0, 30) }));
+  }
+  ops(n) { this.setState(s => ({ ops: Math.max(0, s.ops + n), lastUpdate: now() })); }
+  ask(cfg) { if (this.props.confirmSensitive === false) { cfg.ok(); return; } this.setState({ confirm: cfg }); }
+  setCh(id, p) { this.setState(s => ({ channels: s.channels.map(c => c.id === id ? { ...c, ...p } : c) })); }
+  toggleCh(id, target) {
+    const s = this.state; if (!s.online) return;
+    const c = s.channels.find(x => x.id === id); if (c.status === 'pending') return;
+    const t = target === undefined ? !c.on : target;
+    this.setCh(id, { on: t, status: 'pending' }); this.ops(1);
+    this.later(() => {
+      const bad = c.fails && this.fails();
+      this.setCh(id, { status: bad ? 'unconfirmed' : 'confirmed', at: now() }); this.ops(-1);
+      this.log('Módulo iluminação 3 canais', c.name, t ? 'Ligar' : 'Desligar', bad ? 'Não confirmado' : 'Confirmado');
+    });
+  }
+  setSl(id, v) {
+    const d = this.state.sl[id];
+    v = Math.min(d.max, Math.max(d.min, Math.round(v / d.step) * d.step)); v = +v.toFixed(2);
+    this.setState(s => ({ sl: { ...s.sl, [id]: { ...s.sl[id], v } } }));
+    if (id === 'temp') this.setState({ numInput: num(v), numError: '' });
+  }
+  doCommit(id) {
+    const s = this.state, d = s.sl[id]; if (!s.online || d.v === d.sent) return;
+    this.setState(st => ({ sl: { ...st.sl, [id]: { ...st.sl[id], sent: d.v, sentAt: now(), count: st.sl[id].count + 1 } } }));
+    this.log(d.dev, d.label, 'Definir ' + fmt(d.v, d.unit), 'Confirmado');
+  }
+  keyH(id) {
+    return (e) => {
+      if (!this.state.online) return;
+      const d = this.state.sl[id], big = (d.max - d.min) / 10; let v = d.v;
+      const k = e.key;
+      if (k === 'ArrowUp' || k === 'ArrowRight') v += d.step; else if (k === 'ArrowDown' || k === 'ArrowLeft') v -= d.step;
+      else if (k === 'PageUp') v += big; else if (k === 'PageDown') v -= big; else if (k === 'Home') v = d.min; else if (k === 'End') v = d.max; else return;
+      e.preventDefault(); this.setSl(id, v);
+      clearTimeout(this.kt[id]); this.kt[id] = setTimeout(() => this.doCommit(id), 600);
+    };
+  }
+  slH(id, mode) {
+    const from = (e) => {
+      const r = this.rects[id], d = this.state.sl[id]; let p;
+      if (mode === 'knob') {
+        const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+        let a = Math.atan2(e.clientX - cx, -(e.clientY - cy)) * 180 / Math.PI;
+        if (a > 135) a = 135; if (a < -135) a = -135; p = (a + 135) / 270;
+      } else if (mode === 'v') p = (r.bottom - e.clientY) / r.height;
+      else p = (e.clientX - r.left) / r.width;
+      this.setSl(id, d.min + Math.min(1, Math.max(0, p)) * (d.max - d.min));
+    };
+    return {
+      down: (e) => { if (!this.state.online) return; if (id === 'curtain') { clearInterval(this.civ); this.setState({ cmove: null }); } this.rects[id] = e.currentTarget.getBoundingClientRect(); e.currentTarget.setPointerCapture(e.pointerId); this.drag = id; this.setState({ dragging: id }); from(e); },
+      move: (e) => { if (this.drag === id) from(e); },
+      up: () => { if (this.drag === id) { this.drag = null; this.setState({ dragging: null }); this.later(() => this.doCommit(id), 0); } },
+      key: this.keyH(id),
+    };
+  }
+  slV(id, H) {
+    const d = this.state.sl[id], p = (d.v - d.min) / (d.max - d.min) * 100;
+    return { ...d, ...H, pct: p + '%', thumbX: `calc(${p}% - 12px)`, thumbY: `calc(${p}% - 10px)`, text: fmt(d.v, d.unit), minText: fmt(d.min, d.unit), maxText: fmt(d.max, d.unit),
+      sentText: d.sentAt ? `Último envio ${fmt(d.sent, d.unit)} às ${d.sentAt}` : 'Nenhum envio nesta sessão', count: d.count,
+      adjusting: this.state.dragging === id || d.v !== d.sent, settled: !(this.state.dragging === id || d.v !== d.sent),
+      arc: `${(273.32 * p / 100).toFixed(1)} 364.42`, rot: `rotate(${-135 + 270 * p / 100}deg)` };
+  }
+  applyNum() {
+    const d = this.state.sl.temp, raw = String(this.state.numInput).replace(',', '.').trim(), v = parseFloat(raw);
+    if (raw === '' || isNaN(v)) { this.setState({ numError: 'Digite um número.' }); return; }
+    if (v < d.min || v > d.max) { this.setState({ numError: `Fora do limite do equipamento: ${fmt(d.min, d.unit)} a ${fmt(d.max, d.unit)}. Nada foi enviado.` }); return; }
+    this.setSl('temp', v); this.later(() => this.doCommit('temp'), 0);
+  }
+  sendIR(patch, desc) {
+    const s = this.state; if (!s.online || s.climate.pending) return;
+    this.setState({ climate: { ...s.climate, ...patch, pending: true } }); this.ops(1);
+    this.later(() => { this.setState(st => ({ climate: { ...st.climate, pending: false, sentAt: now(), last: desc } })); this.ops(-1); this.log('Ar-condicionado sala 1', 'IR', desc, 'Enviado · sem confirmação'); });
+  }
+  curtainGo(dir) {
+    if (!this.state.online) return; clearInterval(this.civ);
+    this.log('Persiana estúdio', 'Motor', dir === 'open' ? 'Abrir' : dir === 'close' ? 'Fechar' : 'Parar', 'Confirmado');
+    if (dir === 'stop') { this.setState(s => ({ cmove: null, sl: { ...s.sl, curtain: { ...s.sl.curtain, sent: s.sl.curtain.v, sentAt: now() } } })); return; }
+    this.setState({ cmove: dir });
+    this.civ = setInterval(() => {
+      const d = this.state.sl.curtain, t = dir === 'open' ? 100 : 0;
+      if (d.v === t) { clearInterval(this.civ); this.setState(s => ({ cmove: null, sl: { ...s.sl, curtain: { ...s.sl.curtain, sent: t, sentAt: now() } } })); return; }
+      this.setSl('curtain', d.v + (dir === 'open' ? 5 : -5));
+    }, 300);
+  }
+  sala1(act) {
+    const s = this.state; if (!s.online || s.sala1Curtain.pending) return;
+    this.setState({ sala1Curtain: { pending: true, last: s.sala1Curtain.last } }); this.ops(1);
+    this.later(() => { this.setState({ sala1Curtain: { pending: false, last: act + ' · ' + now() } }); this.ops(-1); this.log('Cortina sala 1', 'IR', act, 'Enviado · sem confirmação'); });
+  }
+  setAct(id, p) { this.setState(s => ({ actions: s.actions.map(a => a.id === id ? { ...a, ...p } : a) })); }
+  runAct(a) {
+    if (!this.state.online || a.res === 'pending') return;
+    this.setAct(a.id, { res: 'pending' }); this.ops(1);
+    this.later(() => { this.setAct(a.id, { res: 'Enviado às ' + now() }); this.ops(-1); this.log(a.group.split(' · ')[0], a.label, 'Executar ação', a.group.includes('infra') ? 'Enviado · sem confirmação' : 'Confirmado'); });
+  }
+  testAct(a) {
+    if (!this.state.online) return; this.setAct(a.id, { st: 'testing' });
+    this.later(() => { this.setAct(a.id, { st: 'tested' }); this.log(a.group.split(' · ')[0], a.label, 'Teste de ação', 'Aprovado', 'Configuração · administrador'); }, 1200);
+  }
+  runGroup(on) {
+    const s = this.state; if (!s.online || s.group.running) return;
+    this.ask({ title: (on ? 'Ligar' : 'Desligar') + ' grupo?', device: 'Grupo Iluminação Ala Norte (5 equipamentos)', func: on ? 'Ligar todos' : 'Desligar todos',
+      detail: 'O comando será enviado a cada equipamento do grupo. O resultado aparece por equipamento.', okLabel: on ? 'Ligar grupo' : 'Desligar grupo',
+      ok: () => {
+        const ms = s.group.members, f = this.fails();
+        this.setState({ group: { ...s.group, running: true, results: ms.map(() => 'pending') } }); this.ops(1);
+        ms.forEach((m, i) => this.later(() => {
+          const out = f ? m.outcome : 'ok';
+          this.setState(st => { const r = [...st.group.results]; r[i] = out; return { group: { ...st.group, results: r, running: r.includes('pending') } }; });
+          if (i < 3) this.setCh('c' + (i + 1), { on, status: 'confirmed', at: now() });
+          this.log(m.name.split(' · ')[0], m.name.split(' · ')[1] ? m.name.split(' · ')[0] : '—', on ? 'Ligar' : 'Desligar', out === 'ok' ? 'Confirmado' : out === 'skip' ? 'Não enviado · ' + m.reason : 'Falhou · ' + m.reason, 'Grupo Ala Norte');
+          if (i === ms.length - 1) this.ops(-1);
+        }, this.lat() * 0.5 + i * 350));
+      } });
+  }
+  runScene(sc) {
+    if (!this.state.online) return; const f = this.fails();
+    this.setState(s => ({ scenePreview: null, sceneRes: { ...s.sceneRes, [sc.id]: sc.items.map(() => 'pending') } })); this.ops(1);
+    sc.items.forEach((it, i) => this.later(() => {
+      const out = f && it.fail ? 'fail' : f && it.skip ? 'skip' : it.ir ? 'sent' : 'ok';
+      this.setState(s => { const r = [...s.sceneRes[sc.id]]; r[i] = out; return { sceneRes: { ...s.sceneRes, [sc.id]: r } }; });
+      this.log(it.dev, '—', it.act, RES[out].label, 'Cena ' + sc.name);
+      if (i === sc.items.length - 1) this.ops(-1);
+    }, 300 + i * 300));
+  }
+  setSch(id, p) { this.setState(s => ({ schedules: s.schedules.map(h => h.id === id ? { ...h, ...p } : h) })); }
+  moveFav(i, d) { this.setState(s => { const a = [...s.favs], j = i + d; if (j < 0 || j >= a.length) return null; [a[i], a[j]] = [a[j], a[i]]; return { favs: a }; }); }
+  runDiag() {
+    clearInterval(this.div); this.setState({ diagStep: 0 });
+    this.div = setInterval(() => { const n = this.state.diagStep + 1; if (n > 4) { clearInterval(this.div); return; } this.setState({ diagStep: n }); }, 550);
+  }
+  discover() {
+    if (!this.state.online) return; this.setState({ discovering: true });
+    this.later(() => this.setState({ discovering: false, discovered: [
+      { id: 'TY-PLG-77C1', name: 'Tomada inteligente', how: 'Rede local · 192.168.10.63', st: 'new' },
+      { id: 'ZB-BTN-1190', name: 'Botão sem fio', how: 'Gateway Zigbee 01 · filho não associado', st: 'new' },
+    ] }), 1600);
+  }
+  setCap(id, p) { this.setState(s => ({ caps: s.caps.map(c => c.id === id ? { ...c, ...p } : c) })); }
+
+  renderVals() {
+    const s = this.state, off = !s.online;
+    if (!this.H) this.H = { bright: this.slH('bright', 'knob'), temp: this.slH('temp', 'h'), curtain: this.slH('curtain', 'v') };
+    const H = this.H;
+    const bright = this.slV('bright', H.bright), temp = this.slV('temp', H.temp), curtain = this.slV('curtain', H.curtain);
+    const svc = s.online ? { label: 'Conectado', fg: 'var(--au-ok-ink)', dot: ST.ok.dot } : { label: 'Desconectado', fg: 'var(--au-err-ink)', dot: ST.noresp.dot };
+
+    const channels = s.channels.map(c => {
+      const on = c.on, st = CMD[c.status];
+      let sh = INSET; if (on && c.status === 'confirmed') sh += ''; if (c.status === 'unconfirmed') sh += ',0 0 0 2px var(--au-err)';
+      return { ...c, st, ariaOn: on ? 'true' : 'false', aria: `${c.name}: ${on ? 'ligado' : 'desligado'}, ${st.label}`, disabled: off || c.status === 'pending',
+        toggle: () => this.toggleCh(c.id), stateText: on ? 'Ligado' : 'Desligado',
+        trackBg: c.status === 'pending' ? 'repeating-linear-gradient(135deg,var(--au-warn-wash) 0 6px,var(--au-bg) 6px 12px)' : on ? 'linear-gradient(90deg,var(--au-accent-soft),var(--au-accent))' : 'var(--au-bg)',
+        trackShadow: sh, knobLeft: on ? '44px' : '4px', knobLeftSm: on ? '34px' : '4px' };
+    });
+    const anyOn = s.channels.some(c => c.on);
+
+    const cl = s.climate, cdis = off || cl.pending;
+    const climate = { ...cl, setText: fmt(cl.set, '°C'), powerAria: cl.power ? 'true' : 'false', powerText: cl.power ? 'Ligado' : 'Desligado',
+      powerShadow: cl.power ? RAISED + ',0 0 0 3px var(--au-bg),0 0 0 5px var(--au-accent-ring)' : RAISED, powerColor: cl.power ? 'var(--au-accent-strong)' : 'var(--au-text-soft)',
+      st: cl.pending ? CMD.pending : CMD.sent, disabled: cdis, oscAria: cl.osc ? 'true' : 'false', oscBg: cl.osc ? 'linear-gradient(90deg,var(--au-accent-soft),var(--au-accent))' : 'var(--au-bg)', oscLeft: cl.osc ? '30px' : '4px',
+      modes: ['Frio', 'Calor', 'Ventilar', 'Auto'].map(m => segItem(m, cl.mode === m, () => this.sendIR({ mode: m }, 'Modo ' + m), cdis)),
+      fans: ['Baixa', 'Média', 'Alta', 'Auto'].map(m => segItem(m, cl.fan === m, () => this.sendIR({ fan: m }, 'Ventilação ' + m), cdis)) };
+
+    const actGroups = [...new Set(s.actions.map(a => a.group))].map(g => ({ name: g, items: s.actions.filter(a => a.group === g).map(a => {
+      const ready = a.st === 'tested';
+      return { ...a, ready, notReady: !ready, disabled: off || !ready || a.res === 'pending', run: () => this.runAct(a), test: () => this.testAct(a),
+        canTest: a.st === 'mapped' || a.st === 'testing', testing: a.st === 'testing',
+        stText: a.st === 'tested' ? (a.res === 'pending' ? 'Enviando…' : a.res || 'Mapeada e testada') : a.st === 'mapped' ? 'Mapeada · aguardando teste' : a.st === 'testing' ? 'Testando…' : 'Não mapeada',
+        stColor: a.st === 'tested' ? 'var(--au-ok-ink)' : a.st === 'unmapped' ? 'var(--au-muted)' : 'var(--au-warn-ink)', color: ready ? 'var(--au-text)' : 'var(--au-faint)', shadow: ready ? '3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light)' : 'inset 2px 2px 4px var(--au-shadow-dark),inset -2px -2px 4px var(--au-shadow-light)' };
+    }) }));
+
+    const g = s.group, gr = g.results;
+    const groupMembers = g.members.map((m, i) => { const r = gr ? gr[i] : null; return { ...m, has: !!r, st: r ? { ...RES[r], label: r === 'ok' ? RES.ok.label : r === 'pending' ? RES.pending.label : RES[r].label + ' · ' + m.reason } : null }; });
+    const groupSummary = gr ? (gr.includes('pending') ? 'Executando…' : `${gr.filter(x => x === 'ok').length} de ${gr.length} confirmados · ${gr.filter(x => x !== 'ok').length} com problema`) : 'Nenhuma execução nesta sessão';
+
+    const scenes = s.scenes.map(sc => { const r = s.sceneRes[sc.id];
+      return { ...sc, count: sc.items.length, hasRes: !!r, preview: () => s.online && this.setState({ scenePreview: sc.id }),
+        results: sc.items.map((it, i) => ({ ...it, st: r ? RES[r[i]] : null })),
+        summary: r ? (r.includes('pending') ? 'Executando…' : `${r.filter(x => x === 'ok' || x === 'sent').length} de ${r.length} executadas`) : '' }; });
+    const sp = s.scenes.find(x => x.id === s.scenePreview);
+
+    const schedules = s.schedules.map(h => ({ ...h, active: h.st === 'active', paused: h.st === 'paused',
+      stText: h.st === 'active' ? 'Ativo' : 'Suspenso', stColor: h.st === 'active' ? 'var(--au-ok-ink)' : 'var(--au-warn-ink)', stDot: h.st === 'active' ? CMD.confirmed.dot : ST.pending.dot,
+      nextText: h.st === 'active' ? h.next : 'Suspenso · sem próxima execução', pauseLabel: h.st === 'active' ? 'Suspender' : 'Retomar',
+      pause: () => { this.setSch(h.id, { st: h.st === 'active' ? 'paused' : 'active' }); this.log('Agendamento', h.name, h.st === 'active' ? 'Suspender' : 'Retomar', 'Confirmado'); },
+      cancel: () => this.ask({ title: 'Cancelar agendamento?', device: h.name, func: 'Cancelar · ' + h.when, detail: 'O agendamento será removido e não poderá ser retomado.', okLabel: 'Cancelar agendamento',
+        ok: () => { this.setState(st => ({ schedules: st.schedules.filter(x => x.id !== h.id) })); this.log('Agendamento', h.name, 'Cancelar', 'Confirmado'); } }) }));
+
+    const rooms = ['Todos', 'Sala de reunião 1', 'Escritório', 'Estúdio', 'Corredor', 'Cobertura', 'Ala Norte'];
+    const inRoom = (d, r) => r === 'Todos' || d.room === r || d.groups.includes(r);
+    const q = s.query.trim().toLowerCase();
+    const list = s.devices.filter(d => inRoom(d, s.room)
+      && (!q || [d.name, d.room, d.type, d.via, ST[d.avail].label, d.id].join(' ').toLowerCase().includes(q))
+      && (s.fType === 'Todos' || d.type === s.fType) && (s.fGw === 'Todos' || d.via === s.fGw)
+      && (!s.fFav || d.fav) && (!s.fCtrl || d.ctrl) && (!s.fProb || d.avail !== 'ok'));
+    const roomTabs = rooms.map(r => ({ label: r === 'Ala Norte' ? 'Ala Norte · grupo' : r, count: s.devices.filter(d => inRoom(d, r)).length, ...segItem(r, s.room === r, () => this.setState({ room: r })) }));
+    const chipF = (k, label) => { const on = s[k]; return { label, aria: on ? 'true' : 'false', toggle: () => this.setState({ [k]: !on }), shadow: on ? INSET : '3px 3px 7px var(--au-shadow-dark),-3px -3px 7px var(--au-shadow-light)', color: on ? 'var(--au-accent-ink)' : 'var(--au-text)', mark: on ? '✓' : '+' }; };
+    const devices = list.map(d => ({ ...d, st: ST[d.avail], favAria: d.fav ? 'true' : 'false', star: d.fav ? '★' : '☆', starColor: d.fav ? 'var(--au-star)' : 'var(--au-faint)', ctrlText: d.ctrl ? 'Controlável' : 'Somente leitura',
+      favLabel: (d.fav ? 'Remover ' : 'Adicionar ') + d.name + (d.fav ? ' dos favoritos' : ' aos favoritos'),
+      toggleFav: () => this.setState(st => {
+        const fav = !d.fav, favs = fav ? [...st.favs, { id: d.id, label: d.name, sub: 'Dispositivo · ' + d.room }] : st.favs.filter(f => f.id !== d.id && f.label !== d.name);
+        return { devices: st.devices.map(x => x.id === d.id ? { ...x, fav } : x), favs };
+      }),
+      roomOpts: rooms.filter(r => r !== 'Todos' && r !== 'Ala Norte').map(r => ({ r })),
+      move: (e) => { const r = e.target.value; this.setState(st => ({ devices: st.devices.map(x => x.id === d.id ? { ...x, room: r } : x) })); this.log(d.name, '—', 'Mover para ' + r, 'Identidade ' + d.id + ' mantida', 'Painel web · administrador'); } }));
+
+    const favs = s.favs.map((f, i) => ({ ...f, pos: i + 1, up: () => this.moveFav(i, -1), down: () => this.moveFav(i, 1), first: i === 0, last: i === s.favs.length - 1,
+      remove: () => this.setState(st => ({ favs: st.favs.filter(x => x.id !== f.id), devices: st.devices.map(x => x.name === f.label ? { ...x, fav: false } : x) })),
+      upLabel: 'Mover ' + f.label + ' para cima', downLabel: 'Mover ' + f.label + ' para baixo', rmLabel: 'Remover ' + f.label + ' dos favoritos' }));
+
+    const P = { '24h': { n: 25, cyc: 1, labels: ['00h', '06h', '12h', '18h', 'agora'], bands: [['33%', '18%'], ['58%', '38%']] },
+      '7d': { n: 29, cyc: 7, labels: ['26/09', '28/09', '30/09', '01/10', 'hoje'], bands: [['5%', '9%'], ['19%', '9%'], ['33%', '9%'], ['47%', '9%'], ['61%', '9%'], ['90%', '8%']] },
+      '30d': { n: 31, cyc: 4.3, labels: ['02/09', '09/09', '16/09', '23/09', 'hoje'], bands: [['4%', '14%'], ['24%', '14%'], ['44%', '14%'], ['64%', '14%'], ['84%', '14%']] } }[s.period];
+    const pts = Array.from({ length: P.n }, (_, i) => { const v = 23.4 + 1.7 * Math.sin(i / (P.n - 1) * Math.PI * 2 * P.cyc - 1.6) + 0.35 * Math.sin(i * 1.9); return [10 + i * 580 / (P.n - 1), 170 - (v - 20) / 8 * 160, v]; });
+    const line = 'M' + pts.map(p => p[0].toFixed(1) + ' ' + p[1].toFixed(1)).join(' L');
+    const area = line + ` L590 180 L10 180 Z`;
+    const vals = pts.map(p => p[2]);
+    const chart = { line, area, labels: P.labels.map(l => ({ l })), bands: P.bands.map(b => ({ left: b[0], width: b[1] })),
+      last: num(vals[vals.length - 1].toFixed(1)) + ' °C', min: num(Math.min(...vals).toFixed(1)) + ' °C', max: num(Math.max(...vals).toFixed(1)) + ' °C',
+      periods: ['24h', '7d', '30d'].map(p => segItem(p === '24h' ? '24 horas' : p === '7d' ? '7 dias' : '30 dias', s.period === p, () => this.setState({ period: p }))) };
+    const kwh = [1.8, 2.1, 2.4, 1.2, 0.4, 0.3, 1.9], days = ['qui', 'sex', 'sáb', 'dom', 'seg', 'ter', 'qua'];
+    const energy = kwh.map((k, i) => ({ h: (k / 2.4 * 100) + '%', k: num(k), d: days[i] }));
+
+    const alerts = s.alerts.map(a => ({ ...a, open: a.st === 'open', closed: a.st !== 'open',
+      stText: a.st === 'open' ? 'Ativo' : a.st === 'ack' ? 'Reconhecido' : 'Silenciado por 1 h',
+      sevColor: a.sev === 'Alta' ? 'var(--au-err-ink)' : a.sev === 'Média' ? 'var(--au-warn-ink)' : 'var(--au-info-ink)',
+      sevDot: a.sev === 'Alta' ? ST.auth.dot : a.sev === 'Média' ? ST.pending.dot : ST.waiting.dot,
+      ack: () => this.setState(st => ({ alerts: st.alerts.map(x => x.id === a.id ? { ...x, st: 'ack' } : x) })),
+      silence: () => this.setState(st => ({ alerts: st.alerts.map(x => x.id === a.id ? { ...x, st: 'silenced' } : x) })),
+      reopen: () => this.setState(st => ({ alerts: st.alerts.map(x => x.id === a.id ? { ...x, st: 'open' } : x) })) }));
+    const openAlerts = s.alerts.filter(a => a.st === 'open').length;
+
+    const tabs = ['Uso', 'Capacidades', 'Conexão', 'Histórico', 'Diagnóstico'].map(t => ({ ...segItem(t, s.tab === t, () => this.setState({ tab: t })) }));
+    const DX = {
+      mod: { name: 'Módulo iluminação 3 canais', steps: [['Configuração', 'IP, identidade e chave local cadastrados', 'ok'], ['Alcance na rede', 'Responde em 14 ms · 192.168.10.52', 'ok'], ['Autenticação', 'Sessão local aceita', 'ok'], ['Leitura de estado', 'Canal 3 não confirmou os 2 últimos comandos', 'warn']],
+        cause: 'O canal 3 recebe o comando, mas o estado lido não muda.', next: 'Verifique a carga ligada ao canal 3 ou revise o código do canal em Capacidades.' },
+      pnl: { name: 'Painel de cenas 4 botões', steps: [['Configuração', 'IP, identidade e chave local cadastrados', 'ok'], ['Alcance na rede', 'Responde em 9 ms · 192.168.10.48', 'ok'], ['Autenticação', 'Chave local recusada pelo dispositivo', 'fail'], ['Leitura de estado', 'Não executada', 'skip']],
+        cause: 'A chave local mudou depois que o painel foi reconfigurado no aplicativo do fabricante.', next: 'Reimporte os dados da conta em Cadastro e descoberta.' },
+      rly: { name: 'Relé bancada técnica', steps: [['Configuração', 'IP, identidade e chave local cadastrados', 'ok'], ['Alcance na rede', 'Sem resposta em 192.168.10.57 (3 tentativas)', 'fail'], ['Autenticação', 'Não executada', 'skip'], ['Leitura de estado', 'Não executada', 'skip']],
+        cause: 'O equipamento não responde no endereço cadastrado. Pode ter recebido outro IP ou estar sem energia.', next: 'Use “Atualizar IPs pela identidade” ou verifique a alimentação do relé.' },
+    }[s.diagTarget];
+    const SG = { ok: ['✓', 'OK', 'var(--au-ok-ink)'], warn: ['!', 'Atenção', 'var(--au-warn-ink)'], fail: ['×', 'Falhou', 'var(--au-err-ink)'], skip: ['–', 'Não executado', 'var(--au-muted)'] };
+    const diagSteps = DX.steps.map((st, i) => { const done = s.diagStep > i, running = s.diagStep === i; const k = done ? SG[st[2]] : null;
+      return { name: st[0], detail: done ? st[1] : running ? 'Verificando…' : 'Aguardando', glyph: k ? k[0] : running ? '…' : '', res: k ? k[1] : '', color: k ? k[2] : 'var(--au-muted)' }; });
+    const diagDone = s.diagStep >= 4;
+    const diagTargets = [['mod', 'Módulo 3 canais'], ['pnl', 'Painel de cenas'], ['rly', 'Relé bancada']].map(([k, l]) => segItem(l, s.diagTarget === k, () => { clearInterval(this.div); this.setState({ diagTarget: k, diagStep: -1 }); }));
+
+    const caps = s.caps.map(c => ({ ...c, readOk: c.read === 'ok', readNo: c.read === 'no', readRunning: c.read === 'run',
+      readText: c.read === 'ok' ? 'Leitura validada' : c.read === 'run' ? 'Lendo…' : 'Leitura não validada', readColor: c.read === 'ok' ? 'var(--au-ok-ink)' : 'var(--au-warn-ink)',
+      writeText: c.write === 'ok' ? 'Escrita liberada' : c.write === 'na' ? 'Sem escrita' : 'Escrita bloqueada', writeColor: c.write === 'ok' ? 'var(--au-ok-ink)' : 'var(--au-muted)',
+      canUnlock: c.write === 'locked' && c.read === 'ok',
+      validate: () => { this.setCap(c.id, { read: 'run' }); this.later(() => { this.setCap(c.id, { read: 'ok' }); this.log('Capacidades', c.code, 'Validar leitura', 'Valor lido e convertido', 'Configuração · administrador'); }, 1100); },
+      unlock: () => this.ask({ title: 'Liberar escrita?', device: c.name, func: c.code + ' · ' + c.range, detail: 'Após liberar, o controle correspondente passa a enviar comandos ao equipamento.', okLabel: 'Liberar escrita', ok: () => this.setCap(c.id, { write: 'ok' }) }) }));
+
+    const roles = [['Ver estados e histórico', '✓', '✓', '✓'], ['Acionar dispositivos e cenas', '–', '✓', '✓'], ['Editar ambientes, grupos e cenas', '–', '–', '✓'], ['Configurar capacidades e descoberta', '–', '–', '✓'], ['Gerenciar usuários e sessões', '–', '–', '✓']].map(r => ({ p: r[0], a: r[1], b: r[2], c: r[3] }));
+
+    const discovered = (s.discovered || []).map(d => ({ ...d, isNew: d.st === 'new', isAuth: d.st === 'auth', authing: d.st === 'run',
+      auth: () => { this.setState(st => ({ discovered: st.discovered.map(x => x.id === d.id ? { ...x, st: 'run' } : x) })); this.later(() => this.setState(st => ({ authCount: st.authCount + 1, discovered: st.discovered.map(x => x.id === d.id ? { ...x, st: 'auth' } : x) })), 1100); } }));
+
+    const TM = { claro: 'light', escuro: 'dark', sistema: 'auto' };
+    const themeAttr = s.themeMode || TM[this.props.theme] || 'light';
+    return {
+      themeAttr, accentAttr: this.props.accent ?? 'ciano',
+      side: { open: s.sideOpen, openAria: s.sideOpen ? 'true' : 'false', w: s.sideOpen ? '248px' : '76px', chev: s.sideOpen ? 'none' : 'rotate(180deg)', toggleLabel: s.sideOpen ? 'Recolher menu' : 'Expandir menu' },
+      toggleSide: () => this.setState({ sideOpen: !s.sideOpen }),
+      navItems: NAV.map(([id, label, icon]) => { const on = s.active === id, badge = id === 's-hist' ? openAlerts : 0;
+        return { href: '#' + id, label, icon, open: s.sideOpen, current: on ? 'true' : undefined, aria: badge ? `${label}, ${badge} alertas ativos` : label,
+          color: on ? 'var(--au-accent-ink)' : 'var(--au-text)', weight: on ? 700 : 600, shadow: on ? INSET : 'none',
+          badge, badgeOpen: !!badge && s.sideOpen, badgeDot: !!badge && !s.sideOpen, go: (e) => { e.preventDefault(); this.goTo(id); } }; }),
+      svcTitle: 'Serviço local ' + svc.label.toLowerCase(),
+      cycleTheme: () => this.setState({ themeMode: themeAttr === 'dark' ? 'light' : 'dark' }),
+      themeIcon: themeAttr === 'dark' ? 'M12 3v2M12 19v2M5 5l1.4 1.4M17.6 17.6L19 19M3 12h2M19 12h2M5 19l1.4-1.4M17.6 6.4L19 5M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z' : 'M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z',
+      themeBtnText: themeAttr === 'dark' ? 'Tema claro' : 'Tema escuro', themeBtnLabel: themeAttr === 'dark' ? 'Mudar para tema claro' : 'Mudar para tema escuro',
+      modalTypes: [
+        { tag: 'R22', title: 'Confirmação', desc: 'Ação sensível com equipamento e função explícitos.', icon: 'M5 12l4 4 10-10', iconColor: 'var(--au-ok-ink)', open: () => this.ask({ title: 'Desligar todos os canais?', device: 'Módulo iluminação 3 canais · Sala de reunião 1', func: 'Desligar canais 1, 2 e 3', detail: 'Exemplo de confirmação. Os três canais serão desligados.', okLabel: 'Desligar todos', ok: () => s.channels.forEach(c => this.toggleCh(c.id, false)) }) },
+        { tag: 'R18', title: 'Formulário', desc: 'Criação de agendamento com validação de campos.', icon: 'M12 7v5l3 2M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z', iconColor: 'var(--au-accent-ink)', open: () => this.openModal('form') },
+        { tag: 'R08', title: 'Informação', desc: 'Lista de dispositivos associados a um gateway.', icon: 'M4 6h16M4 12h16M4 18h10', iconColor: 'var(--au-info-ink)', open: () => this.openModal('info') },
+        { tag: 'R21', title: 'Alerta crítico', desc: 'Falha com causa provável e próxima ação.', icon: 'M12 4l9 16H3zM12 10v4M12 17h.01', iconColor: 'var(--au-err-ink)', open: () => this.openModal('alert') },
+        { tag: 'R03', title: 'Painel lateral', desc: 'Edição sem sair do contexto: renomear um canal.', icon: 'M4 5h16v14H4zM14 5v14', iconColor: 'var(--au-text-soft)', open: () => this.openModal('drawer') },
+      ],
+      mForm: s.modal === 'form', mInfo: s.modal === 'info', mAlert: s.modal === 'alert', mDrawer: s.modal === 'drawer',
+      closeModal: () => this.setState({ modal: null }), backdropClose: (e) => { if (e.target === e.currentTarget) this.setState({ modal: null }); },
+      form: { ...s.form, hasErr: !!s.form.err },
+      onFormName: (e) => this.setState({ form: { ...s.form, name: e.target.value, err: '' } }),
+      onFormTarget: (e) => this.setState({ form: { ...s.form, target: e.target.value } }),
+      onFormTime: (e) => this.setState({ form: { ...s.form, time: e.target.value } }),
+      formActions: ['Ligar', 'Desligar'].map(a => segItem(a, s.form.action === a, () => this.setState({ form: { ...s.form, action: a } }))),
+      formTargets: ['Grupo Iluminação Ala Norte', 'Módulo iluminação 3 canais', 'Ar-condicionado sala 1', 'Persiana estúdio'].map(v => ({ v })),
+      formDays: DAYS.map(d => { const on = s.form.days.includes(d); return { ...segItem(d, on, null), toggle: () => this.setState({ form: { ...s.form, err: '', days: on ? s.form.days.filter(x => x !== d) : DAYS.filter(x => x === d || s.form.days.includes(x)) } }) }; }),
+      saveForm: () => {
+        const f = s.form;
+        if (!f.name.trim()) { this.setState({ form: { ...f, err: 'Informe um nome para o agendamento.' } }); return; }
+        if (!f.days.length) { this.setState({ form: { ...f, err: 'Selecione pelo menos um dia.' } }); return; }
+        const when = (f.days.length === 7 ? 'Todos os dias' : f.days.join(', ')) + ' · ' + f.time;
+        this.setState(st => ({ modal: null, schedules: [...st.schedules, { id: 'h' + Date.now(), name: f.name.trim() + ' · ' + f.action + ' ' + f.target, when, next: f.days[0] + ', ' + f.time, st: 'active' }] }));
+        this.log('Agendamento', f.target, 'Criar · ' + f.action + ' ' + when, 'Confirmado');
+      },
+      infoToDiag: () => { this.setState({ modal: null, tab: 'Diagnóstico' }); this.later(() => this.goTo('s-det'), 50); },
+      alertAck: () => this.setState(st => ({ modal: null, alerts: st.alerts.map(x => x.id === 'al1' ? { ...x, st: 'ack' } : x) })),
+      alertSilence: () => this.setState(st => ({ modal: null, alerts: st.alerts.map(x => x.id === 'al1' ? { ...x, st: 'silenced' } : x) })),
+      drawerChannels: s.channels.map((c, i) => ({ ...segItem(c.name, s.drawer.ch === c.id, () => this.setState({ drawer: { ch: c.id, name: c.name, err: '' } })), code: 'switch_' + (i + 1) })),
+      drawer: { ...s.drawer, hasErr: !!s.drawer.err, code: 'switch_' + (s.channels.findIndex(c => c.id === s.drawer.ch) + 1) },
+      onDrawerName: (e) => this.setState({ drawer: { ...s.drawer, name: e.target.value, err: '' } }),
+      saveDrawer: () => {
+        const d = s.drawer, n = d.name.trim();
+        if (!n) { this.setState({ drawer: { ...d, err: 'O nome não pode ficar vazio.' } }); return; }
+        if (n.length > 32) { this.setState({ drawer: { ...d, err: 'Use no máximo 32 caracteres.' } }); return; }
+        const old = s.channels.find(c => c.id === d.ch).name;
+        this.setCh(d.ch, { name: n }); this.setState({ modal: null });
+        this.log('Módulo iluminação 3 canais', old, 'Renomear para “' + n + '”', 'Identidade TY-3CH-8F21A0 mantida', 'Painel web · administrador');
+      },
+      themeOpts: [['light', 'Claro'], ['dark', 'Escuro'], ['auto', 'Sistema']].map(([k, l]) => segItem(l, themeAttr === k, () => this.setState({ themeMode: k }))),
+      off, ops: s.ops, lastUpdate: s.lastUpdate, svc, svcBtn: s.online ? 'Simular desconexão' : 'Reconectar serviço',
+      toggleService: () => { this.setState({ online: !s.online, lastUpdate: now() }); this.log('Serviço local', '—', 'Conectividade', s.online ? 'Desconectado' : 'Conectado', 'Sistema'); },
+      dimOff: off ? 0.5 : 1,
+      commStates: Object.values(ST), cmdStates: [CMD.confirmed, CMD.pending, CMD.unconfirmed, CMD.sent],
+      basePowerAria: s.basePower ? 'true' : 'false', toggleBasePower: () => this.setState({ basePower: !s.basePower }),
+      basePowerShadow: s.basePower ? RAISED + ',0 0 0 3px var(--au-bg),0 0 0 5px var(--au-accent-ring)' : RAISED, basePowerColor: s.basePower ? 'var(--au-accent-strong)' : 'var(--au-text-soft)',
+      baseCheckAria: s.baseCheck ? 'true' : 'false', baseCheckMark: s.baseCheck ? '✓' : '', toggleBaseCheck: () => this.setState({ baseCheck: !s.baseCheck }),
+      baseRadios: ['Cards', 'Lista'].map(r => ({ label: r, aria: s.baseRadio === r ? 'true' : 'false', dot: s.baseRadio === r ? 'var(--au-accent)' : 'transparent', pick: () => this.setState({ baseRadio: r }) })),
+      channels, allOff: () => s.online && this.ask({ title: 'Desligar todos os canais?', device: 'Módulo iluminação 3 canais · Sala de reunião 1', func: 'Desligar canais 1, 2 e 3', detail: 'Os três canais serão desligados. Pessoas na sala ficarão sem iluminação.', okLabel: 'Desligar todos', ok: () => s.channels.forEach(c => this.toggleCh(c.id, false)) }),
+      allOffDisabled: off || !anyOn || s.channels.some(c => c.status === 'pending'),
+      bright, temp, curtain,
+      brightDown: () => { this.setSl('bright', s.sl.bright.v - 5); this.later(() => this.doCommit('bright'), 0); },
+      brightUp: () => { this.setSl('bright', s.sl.bright.v + 5); this.later(() => this.doCommit('bright'), 0); },
+      numInput: s.numInput, numError: s.numError, hasNumError: !!s.numError,
+      onNum: (e) => this.setState({ numInput: e.target.value, numError: '' }), onNumKey: (e) => { if (e.key === 'Enter') this.applyNum(); }, onNumBlur: () => this.applyNum(),
+      tempUp: () => { this.setSl('temp', s.sl.temp.v + 0.5); this.later(() => this.doCommit('temp'), 0); },
+      tempDown: () => { this.setSl('temp', s.sl.temp.v - 0.5); this.later(() => this.doCommit('temp'), 0); },
+      tempAtMax: off || s.sl.temp.v >= 30, tempAtMin: off || s.sl.temp.v <= 16,
+      ticks: Array.from({ length: 11 }, (_, i) => ({ w: i % 5 === 0 ? '14px' : '8px', l: i % 5 === 0 ? (100 - i * 10) + '%' : '' })),
+      gw1Open: s.gwOpen === 'gw1', gw1Label: s.gwOpen === 'gw1' ? 'Ocultar dispositivos associados' : 'Ver dispositivos associados', toggleGw1: () => this.setState({ gwOpen: s.gwOpen === 'gw1' ? null : 'gw1' }),
+      gw1Children: s.devices.filter(d => d.via === 'Gateway Zigbee 01').map(d => ({ name: d.name, room: d.room, st: ST[d.avail] })),
+      gwOk: ST.ok, gwDown: ST.noresp,
+      climate, powerToggle: () => this.sendIR({ power: !cl.power }, cl.power ? 'Desligar' : 'Ligar · ' + fmt(cl.set, '°C') + ' · ' + cl.mode),
+      setUp: () => cl.set < 30 && this.sendIR({ set: cl.set + 1 }, 'Temperatura ' + fmt(cl.set + 1, '°C')), setDown: () => cl.set > 17 && this.sendIR({ set: cl.set - 1 }, 'Temperatura ' + fmt(cl.set - 1, '°C')),
+      oscToggle: () => this.sendIR({ osc: !cl.osc }, cl.osc ? 'Oscilação desligada' : 'Oscilação ligada'),
+      cOpen: () => this.curtainGo('open'), cClose: () => this.curtainGo('close'), cStop: () => this.curtainGo('stop'),
+      cMoveText: s.cmove === 'open' ? 'Abrindo…' : s.cmove === 'close' ? 'Fechando…' : 'Parada', cSt: s.cmove ? CMD.pending : CMD.confirmed,
+      s1Open: () => this.sala1('Abrir'), s1Close: () => this.sala1('Fechar'), s1Stop: () => this.sala1('Parar'),
+      s1: { ...s.sala1Curtain, st: s.sala1Curtain.pending ? CMD.pending : CMD.sent, disabled: off || s.sala1Curtain.pending }, noPos: ST.stale,
+      actGroups,
+      groupMembers, groupSummary, groupBusy: off || g.running, groupOn: () => this.runGroup(true), groupOff: () => this.runGroup(false),
+      scenes, scenePreviewOpen: !!sp, scenePreview: sp ? { name: sp.name, count: sp.items.length, items: sp.items } : { name: '', count: 0, items: [] },
+      closeScenePreview: () => this.setState({ scenePreview: null }), runScenePreview: () => sp && this.runScene(sp),
+      schedules, schedEmpty: s.schedules.length === 0,
+      query: s.query, onQuery: (e) => this.setState({ query: e.target.value }), clearQuery: () => this.setState({ query: '' }), hasQuery: !!s.query,
+      roomTabs, fType: s.fType, fGw: s.fGw, onType: (e) => this.setState({ fType: e.target.value }), onGw: (e) => this.setState({ fGw: e.target.value }),
+      typeOpts: ['Todos', ...new Set(s.devices.map(d => d.type))].map(v => ({ v })), gwOpts: ['Todos', ...new Set(s.devices.map(d => d.via))].map(v => ({ v })),
+      filterChips: [chipF('fFav', 'Favoritos'), chipF('fCtrl', 'Controláveis'), chipF('fProb', 'Com problemas')],
+      devices, resultText: `${list.length} de ${s.devices.length} dispositivos`, noResults: list.length === 0,
+      favs, favEmpty: s.favs.length === 0,
+      chart, energy, logRows: s.log.slice(0, 9), alerts, openAlerts,
+      tabs, tabUso: s.tab === 'Uso', tabCap: s.tab === 'Capacidades', tabCon: s.tab === 'Conexão', tabHis: s.tab === 'Histórico', tabDia: s.tab === 'Diagnóstico',
+      devHistory: s.log.filter(l => l.dev === 'Módulo iluminação 3 canais').slice(0, 6),
+      diag: { ...DX, done: diagDone, idle: s.diagStep < 0, running: s.diagStep >= 0 && !diagDone }, diagSteps, diagTargets, runDiag: () => this.runDiag(),
+      caps, roles,
+      discovering: s.discovering, discover: () => this.discover(), discovered, hasDiscovered: !!s.discovered, authCount: s.authCount, discoverLabel: s.discovering ? 'Buscando na rede…' : 'Buscar na rede',
+      importAccount: () => s.online && this.log('Conta do fabricante', '—', 'Importar dados da conta', '10 dispositivos · 1 chave atualizada', 'Configuração · administrador'),
+      updateIps: () => s.online && this.log('Relé bancada técnica', '—', 'Atualizar IP pela identidade TY-RLY-2B90', '192.168.10.57 → 192.168.10.61', 'Configuração · administrador'),
+      exportCfg: () => this.log('Configuração', '—', 'Exportar ambientes, nomes, grupos e mapeamentos', 'Arquivo gerado · sem credenciais', 'Configuração · administrador'),
+      restoreCfg: () => this.ask({ title: 'Restaurar configuração?', device: 'Serviço local', func: 'Substituir ambientes, nomes, grupos e mapeamentos', detail: 'A configuração atual será substituída pelo arquivo escolhido. Credenciais não são alteradas.', okLabel: 'Restaurar', ok: () => this.log('Configuração', '—', 'Restaurar configuração', 'Concluído', 'Configuração · administrador') }),
+      restartSvc: () => this.ask({ title: 'Reiniciar serviço local?', device: 'Serviço local de automação', func: 'Reinicialização controlada', detail: 'Comandos e agendamentos ficam indisponíveis por alguns segundos. Operações pendentes serão concluídas antes.', okLabel: 'Reiniciar serviço',
+        ok: () => { this.setState({ online: false }); this.log('Serviço local', '—', 'Reiniciar', 'Em andamento', 'Configuração · administrador'); this.later(() => { this.setState({ online: true, lastUpdate: now() }); this.log('Serviço local', '—', 'Reiniciar', 'Conectado', 'Sistema'); }, 2500); } }),
+      confirmOpen: !!s.confirm, confirm: s.confirm || { title: '', device: '', func: '', detail: '', okLabel: '' },
+      cancelConfirm: () => this.setState({ confirm: null }), okConfirm: () => { const c = s.confirm; this.setState({ confirm: null }); c && c.ok(); },
+    };
+  }
+}
+</script>
+</body>
+</html>

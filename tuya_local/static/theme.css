@@ -1,0 +1,3 @@
+/* Ajustes locais do kit. Os temas e acentos são definidos em automacao-ui.css. */
+:root{color-scheme:light}body[data-au-theme=dark]{color-scheme:dark}
+@media(prefers-color-scheme:dark){body[data-au-theme=auto]{color-scheme:dark}}

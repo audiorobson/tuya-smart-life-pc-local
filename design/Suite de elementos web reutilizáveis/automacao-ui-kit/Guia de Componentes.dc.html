@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./automacao-ui.css">
+<style>
+body{margin:0;background:#e4e7ec}
+a{color:var(--au-accent-ink)}a:hover{color:var(--au-accent-ink-hover)}
+</style>
+</helmet>
+<div class="au-root" data-au-theme="{{ theme }}" data-au-accent="{{ accent }}" style="min-height:100vh;padding:36px 28px 80px;box-sizing:border-box">
+<div style="max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:40px">
+
+<header style="display:flex;flex-direction:column;gap:18px">
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap">
+    <div style="display:flex;flex-direction:column;gap:6px"><span class="au-label">Painel Automação · UI Kit v1.0</span><h1 style="margin:0;font-size:34px;font-weight:800;color:var(--au-text-strong)">Guia de componentes</h1></div>
+    <a href="Suite Automacao.dc.html" style="font-weight:600;font-size:14px">Abrir suíte interativa</a>
+  </div>
+  <p style="margin:0;max-width:760px;font-size:15px;line-height:1.6;color:var(--au-muted);text-wrap:pretty">Referência para reaproveitar os elementos no projeto original. Todos os estilos estão em <code class="au-mono">automacao-ui.css</code>; os componentes usam apenas classes <code class="au-mono">au-*</code>, atributos ARIA e atributos <code class="au-mono">data-*</code> de estado. Nenhum JavaScript é exigido para a aparência: o código da aplicação só altera atributos.</p>
+  <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:center">
+    <div class="au-seg" role="radiogroup" aria-label="Tema"><sc-for list="{{ themeOpts }}" as="o" hint-placeholder-count="3"><button class="au-seg__item" role="radio" aria-checked="{{ o.on }}" onClick="{{ o.pick }}">{{ o.label }}</button></sc-for></div>
+    <div class="au-seg" role="radiogroup" aria-label="Acento"><sc-for list="{{ accentOpts }}" as="o" hint-placeholder-count="5"><button class="au-seg__item" role="radio" aria-checked="{{ o.on }}" onClick="{{ o.pick }}" style="display:flex;gap:8px;align-items:center"><span style="width:12px;height:12px;border-radius:50%;background:{{ o.sw }}"></span>{{ o.label }}</button></sc-for></div>
+  </div>
+</header>
+
+<section class="au-card">
+  <h2 style="margin:0;font-size:20px;color:var(--au-text-strong)">1. Instalação e tema</h2>
+  <pre class="au-inset au-mono" style="margin:0;font-size:12.5px;line-height:1.6;overflow-x:auto;white-space:pre">&lt;link rel="stylesheet" href="automacao-ui.css"&gt;
+
+&lt;!-- data-au-theme: light | dark | auto (segue o sistema) --&gt;
+&lt;!-- data-au-accent: ciano | verde | ambar | violeta | azul --&gt;
+&lt;div class="au-root" data-au-theme="auto" data-au-accent="ciano"&gt; … &lt;/div&gt;
+
+// Trocar tema em tempo de execução
+document.querySelector('.au-root').dataset.auTheme = 'dark';</pre>
+  <p class="au-meta" style="margin:0;line-height:1.55">Os tokens são recalculados no elemento que recebe <code class="au-mono">data-au-theme</code>. Para criar um acento novo, declare um bloco <code class="au-mono">[data-au-accent="nome"]</code> com as 10 variáveis <code class="au-mono">--au-accent-*</code> e <code class="au-mono">--au-on-accent</code>.</p>
+</section>
+
+<section class="au-card">
+  <h2 style="margin:0;font-size:20px;color:var(--au-text-strong)">2. Tokens</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px">
+    <sc-for list="{{ tokens }}" as="k" hint-placeholder-count="12">
+      <div style="display:flex;gap:10px;align-items:center"><span style="width:34px;height:34px;flex:none;border-radius:10px;background:{{ k.v }};box-shadow:var(--au-elev-1)"></span><div style="display:flex;flex-direction:column;gap:2px;min-width:0"><span class="au-mono" style="font-size:12px;color:var(--au-text-strong)">{{ k.n }}</span><span style="font-size:12px;color:var(--au-muted)">{{ k.d }}</span></div></div>
+    </sc-for>
+  </div>
+  <p class="au-meta" style="margin:0">Relevo: <code class="au-mono">--au-elev-1</code> (botões), <code class="au-mono">--au-elev-2</code> (cards), <code class="au-mono">--au-inset-sm</code> / <code class="au-mono">--au-inset</code> (trilhos, campos, áreas de leitura). Raios: 10 · 12 · 16 · 22 px.</p>
+</section>
+
+<sc-for list="{{ comps }}" as="c" hint-placeholder-count="6">
+  <section class="au-card">
+    <div style="display:flex;justify-content:space-between;gap:12px;align-items:baseline;flex-wrap:wrap"><h2 style="margin:0;font-size:20px;color:var(--au-text-strong)">{{ c.title }}</h2><span class="au-tag">{{ c.req }}</span></div>
+    <p style="margin:0;font-size:14px;line-height:1.55;color:var(--au-text);max-width:760px">{{ c.desc }}</p>
+    <div class="au-inset" style="display:flex;flex-wrap:wrap;gap:16px;align-items:center;padding:20px">{{ c.demo }}</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px">
+      <div style="display:flex;flex-direction:column;gap:8px"><span class="au-label">Marcação</span><pre class="au-inset au-mono" style="margin:0;font-size:12px;line-height:1.6;overflow-x:auto;white-space:pre">{{ c.code }}</pre></div>
+      <div style="display:flex;flex-direction:column;gap:8px"><span class="au-label">Estados e acessibilidade</span>
+        <ul style="margin:0;padding-left:18px;font-size:13px;line-height:1.6;color:var(--au-text)"><sc-for list="{{ c.notes }}" as="n" hint-placeholder-count="3"><li>{{ n.t }}</li></sc-for></ul>
+      </div>
+    </div>
+  </section>
+</sc-for>
+
+<section class="au-card">
+  <h2 style="margin:0;font-size:20px;color:var(--au-text-strong)">Regras de uso</h2>
+  <ul style="margin:0;padding-left:18px;font-size:14px;line-height:1.7">
+    <li>Habilite um controle somente quando a função e os valores aceitos pelo equipamento estiverem confirmados (Capacidades → leitura validada → escrita liberada).</li>
+    <li>Envie valores contínuos ao soltar (pointerup) ou após 600 ms sem teclas; nunca a cada movimento.</li>
+    <li>Enquanto houver operação pendente, use <code class="au-mono">data-status="pending"</code> e <code class="au-mono">disabled</code> para impedir cliques repetidos.</li>
+    <li>Ações sensíveis e comandos em grupo passam pelo modal de confirmação com equipamento e função explícitos.</li>
+    <li>Com o serviço local desconectado, aplique <code class="au-mono">disabled</code> em todos os comandos e exiba os estados como último valor conhecido.</li>
+    <li>Estado nunca é indicado só por cor: cada indicador combina forma do ponto e texto.</li>
+  </ul>
+</section>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;claro&quot;,&quot;escuro&quot;,&quot;sistema&quot;],&quot;default&quot;:&quot;claro&quot;,&quot;tsType&quot;:&quot;'claro'|'escuro'|'sistema'&quot;,&quot;section&quot;:&quot;Tema&quot;},&quot;accent&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;ciano&quot;,&quot;verde&quot;,&quot;ambar&quot;,&quot;violeta&quot;,&quot;azul&quot;],&quot;default&quot;:&quot;ciano&quot;,&quot;tsType&quot;:&quot;'ciano'|'verde'|'ambar'|'violeta'|'azul'&quot;,&quot;section&quot;:&quot;Tema&quot;}}">
+const h = React.createElement;
+const ACC = { ciano: '#1fb6e0', verde: '#22b07d', ambar: '#e8a21f', violeta: '#8a6cf0', azul: '#3b82f6' };
+const PWR = () => h('svg', { width: 26, height: 26, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2.2, strokeLinecap: 'round' }, h('path', { d: 'M12 3v8' }), h('path', { d: 'M6.3 6.8a8 8 0 1 0 11.4 0' }));
+const chip = (state, label) => h('span', { className: 'au-chip', 'data-state': state, key: state + label }, h('span', { className: 'au-dot' }), label);
+
+class Component extends DCLogic {
+  state = { theme: null, accent: null, sw: true, pw: true, seg: 'Frio', val: 64, sideOpen: true };
+  renderVals() {
+    const s = this.state;
+    const theme = s.theme || ({ claro: 'light', escuro: 'dark', sistema: 'auto' }[this.props.theme]) || 'light';
+    const accent = s.accent || this.props.accent || 'ciano';
+    const tokens = [
+      ['--au-bg', 'Superfície'], ['--au-text', 'Texto'], ['--au-text-strong', 'Títulos'], ['--au-muted', 'Texto secundário'],
+      ['--au-accent', 'Acento / ligado'], ['--au-accent-ink', 'Texto de acento'], ['--au-ok', 'Conectado / confirmado'], ['--au-err', 'Falha / sem resposta'],
+      ['--au-warn', 'Pendente'], ['--au-info', 'Aguardando / enviado'], ['--au-stale', 'Desatualizado'], ['--au-divider', 'Divisórias'],
+    ].map(([n, d]) => ({ n, d, v: `var(${n})` }));
+
+    const swDemo = [
+      h('button', { key: 'a', className: 'au-switch', role: 'switch', 'aria-checked': String(s.sw), 'data-status': 'confirmed', 'aria-label': 'Exemplo interativo', onClick: () => this.setState({ sw: !s.sw }) }),
+      h('button', { key: 'b', className: 'au-switch', role: 'switch', 'aria-checked': 'true', 'data-status': 'pending', disabled: true, 'aria-label': 'Enviando' }),
+      h('button', { key: 'c', className: 'au-switch', role: 'switch', 'aria-checked': 'true', 'data-status': 'unconfirmed', 'aria-label': 'Não confirmado' }),
+      h('button', { key: 'd', className: 'au-switch', role: 'switch', 'aria-checked': 'true', 'data-status': 'unavailable', disabled: true, 'aria-label': 'Indisponível' }),
+      h('button', { key: 'e', className: 'au-switch au-switch--sm', role: 'switch', 'aria-checked': 'true', 'aria-label': 'Pequeno' }),
+    ];
+    const btnDemo = [
+      h('button', { key: 1, className: 'au-btn' }, 'Botão'), h('button', { key: 2, className: 'au-btn au-btn--primary' }, 'Principal'),
+      h('button', { key: 3, className: 'au-btn au-btn--danger' }, 'Ação sensível'), h('button', { key: 4, className: 'au-btn', disabled: true }, 'Indisponível'),
+      h('button', { key: 5, className: 'au-btn au-power', 'aria-pressed': String(s.pw), 'aria-label': 'Energia', onClick: () => this.setState({ pw: !s.pw }) }, PWR()),
+      h('button', { key: 6, className: 'au-btn au-icon-btn', 'aria-label': 'Menu' }, h('svg', { width: 22, height: 22, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2.2, strokeLinecap: 'round' }, h('path', { d: 'M5 7h14M5 12h14M5 17h14' }))),
+    ];
+    const chipDemo = [chip('ok', 'Conectado'), chip('noresp', 'Sem resposta'), chip('waiting', 'Aguardando evento'), chip('config', 'Configuração pendente'), chip('auth', 'Erro de autenticação'), chip('stale', 'Desatualizado'),
+      chip('confirmed', 'Confirmado'), chip('pending', 'Enviando…'), chip('unconfirmed', 'Não confirmado'), chip('sent', 'Enviado · sem retorno')];
+    const segDemo = h('div', { className: 'au-seg', role: 'radiogroup', 'aria-label': 'Modo' }, ['Frio', 'Calor', 'Ventilar', 'Auto'].map(m => h('button', { key: m, className: 'au-seg__item', role: 'radio', 'aria-checked': String(s.seg === m), onClick: () => this.setState({ seg: m }) }, m)));
+    const setV = (e) => { const r = e.currentTarget.getBoundingClientRect(); this.setState({ val: Math.round(Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)) * 100) }); };
+    const sliderDemo = [
+      h('div', { key: 's', style: { flex: 1, minWidth: 220, display: 'flex', flexDirection: 'column', gap: 8 } },
+        h('span', { className: 'au-label' }, `Brilho · ${s.val}%`),
+        h('div', { className: 'au-slider', role: 'slider', tabIndex: 0, 'aria-label': 'Brilho', 'aria-valuemin': 0, 'aria-valuemax': 100, 'aria-valuenow': s.val, 'aria-valuetext': s.val + '%', style: { '--au-value': s.val + '%' },
+          onPointerDown: (e) => { e.currentTarget.setPointerCapture(e.pointerId); this.dr = true; setV(e); }, onPointerMove: (e) => this.dr && setV(e), onPointerUp: () => { this.dr = false; },
+          onKeyDown: (e) => { const d = e.key === 'ArrowRight' || e.key === 'ArrowUp' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowDown' ? -1 : 0; if (d) { e.preventDefault(); this.setState({ val: Math.min(100, Math.max(0, s.val + d)) }); } } },
+          h('div', { className: 'au-slider__fill' }), h('div', { className: 'au-slider__thumb' }))),
+      h('div', { key: 'f', className: 'au-fader', role: 'slider', 'aria-orientation': 'vertical', 'aria-label': 'Posição', 'aria-valuenow': s.val, style: { '--au-value': s.val + '%', height: 140 } }, h('div', { className: 'au-fader__fill' }), h('div', { className: 'au-fader__thumb' })),
+      h('div', { key: 'k', className: 'au-knob', role: 'slider', 'aria-label': 'Knob', 'aria-valuenow': s.val, style: { '--au-angle': (-135 + 2.7 * s.val) + 'deg' } }, h('div', { className: 'au-knob__face' }), h('div', { className: 'au-knob__pointer' })),
+      h('div', { key: 'st', className: 'au-stepper' }, h('input', { 'aria-label': 'Temperatura', defaultValue: '22,5', inputMode: 'decimal' }), h('span', { style: { fontSize: 13, color: 'var(--au-muted)', paddingRight: 6 } }, '°C'),
+        h('div', { className: 'au-stepper__btns' }, h('button', { 'aria-label': 'Aumentar' }, '▲'), h('button', { 'aria-label': 'Diminuir' }, '▼'))),
+    ];
+    const fieldDemo = [
+      h('div', { key: 'f', className: 'au-field', style: { flex: 1, minWidth: 240 } }, h('input', { type: 'search', placeholder: 'Buscar dispositivos…', 'aria-label': 'Buscar dispositivos' })),
+      h('select', { key: 's', className: 'au-select', 'aria-label': 'Tipo' }, ['Todos', 'Interruptor', 'Sensor'].map(o => h('option', { key: o }, o))),
+      h('div', { key: 'p', className: 'au-seg au-seg--pill' }, ['Favoritos', 'Controláveis', 'Com problemas'].map((o, i) => h('button', { key: o, className: 'au-seg__item', 'aria-pressed': String(i === 2) }, o))),
+      h('button', { key: 'c', className: 'au-checkbox', role: 'checkbox', 'aria-checked': 'true', 'aria-label': 'Selecionado' }),
+      h('button', { key: 'r', className: 'au-radio', role: 'radio', 'aria-checked': 'true', 'aria-label': 'Opção' }),
+    ];
+    const cardDemo = h('article', { className: 'au-card', style: { width: '100%', maxWidth: 420 }, 'aria-label': 'Módulo iluminação 3 canais' },
+      h('div', { style: { display: 'flex', justifyContent: 'space-between', gap: 10 } }, h('div', null, h('strong', { style: { fontSize: 16 } }, 'Módulo iluminação 3 canais'), h('div', { className: 'au-meta' }, 'Sala de reunião 1 · Interruptor · Conexão direta')), h('span', { className: 'au-tag' }, 'R01')),
+      h('div', { style: { display: 'flex', gap: 10, alignItems: 'center' } }, chip('ok', 'Conectado'), h('span', { className: 'au-meta' }, 'Última leitura 14:32:08')),
+      h('div', { className: 'au-inset', style: { padding: '4px 16px' } },
+        ...[['Luz principal', 'true', 'confirmed'], ['Bancada', 'false', 'confirmed'], ['Iluminação indireta', 'true', 'unconfirmed']].map(([n, c, st]) =>
+          h('div', { key: n, className: 'au-row' }, h('div', { style: { flex: 1 } }, h('div', { style: { fontWeight: 600 } }, n), h('span', { className: 'au-chip au-chip--bare', 'data-state': st }, h('span', { className: 'au-dot' }), st === 'confirmed' ? 'Confirmado' : 'Não confirmado')),
+            h('button', { className: 'au-switch', role: 'switch', 'aria-checked': c, 'data-status': st, 'aria-label': n })))));
+    const sensorDemo = [
+      h('div', { key: 'a', className: 'au-inset', style: { display: 'flex', flexDirection: 'column', gap: 6, minWidth: 170 } }, h('span', { className: 'au-meta' }, 'Escritório · Temperatura'), h('strong', { style: { fontSize: 26, color: 'var(--au-text-strong)' } }, '24,6 °C'), h('span', { className: 'au-chip au-chip--bare', 'data-state': 'ok' }, 'Leitura atual · há 40 s')),
+      h('div', { key: 'b', className: 'au-inset au-inset--stale', style: { display: 'flex', flexDirection: 'column', gap: 6, minWidth: 170 } }, h('span', { className: 'au-meta' }, 'Cobertura · Chuva'), h('strong', { style: { fontSize: 22, color: 'var(--au-text-soft)' } }, 'Sem chuva'), h('span', { className: 'au-chip au-chip--bare', 'data-state': 'stale' }, 'Último valor · 08:15')),
+    ];
+    const modalDemo = h('div', { className: 'au-modal', role: 'dialog', 'aria-label': 'Exemplo de confirmação', style: { boxShadow: 'var(--au-elev-2)' } },
+      h('strong', { style: { fontSize: 18 } }, 'Desligar grupo?'),
+      h('div', { className: 'au-inset', style: { display: 'grid', gridTemplateColumns: 'auto 1fr', gap: '6px 14px', fontSize: 14 } }, h('span', { className: 'au-meta' }, 'Equipamento'), h('strong', null, 'Iluminação Ala Norte (5)'), h('span', { className: 'au-meta' }, 'Função'), h('strong', null, 'Desligar todos')),
+      h('div', { style: { display: 'flex', justifyContent: 'flex-end', gap: 10 } }, h('button', { className: 'au-btn' }, 'Cancelar'), h('button', { className: 'au-btn au-btn--primary' }, 'Desligar grupo')));
+
+    const navI = [['Visão geral', 'M4 11l8-7 8 7v9h-5v-6h-6v6H4z', 0], ['Dispositivos', 'M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.8.8 1 1.5 1 2.5h6c0-1 .2-1.7 1-2.5A6 6 0 0 0 12 3z', 0], ['Alertas', 'M6 16v-5a6 6 0 1 1 12 0v5l2 2H4zM10 20a2 2 0 0 0 4 0', 3], ['Administração', 'M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M14 4v4M8 10v4M16 16v4', 0]];
+    const ic = (d, cls) => h('svg', { className: cls, width: 20, height: 20, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.9, strokeLinecap: 'round', strokeLinejoin: 'round', 'aria-hidden': true }, h('path', { d }));
+    const sideDemo = h('nav', { className: 'au-sidebar', 'data-collapsed': String(!s.sideOpen), 'aria-label': 'Exemplo de menu', style: { position: 'relative', height: 420, borderRadius: 18 } },
+      h('div', { className: 'au-sidebar__brand' }, h('span', { className: 'au-sidebar__mark' }, 'PA'), h('span', { className: 'au-sidebar__text', style: { fontWeight: 800, letterSpacing: '.05em' } }, 'PAINEL')),
+      h('button', { className: 'au-sidebar__toggle', 'aria-expanded': String(s.sideOpen), onClick: () => this.setState({ sideOpen: !s.sideOpen }) }, ic('M15 6l-6 6 6 6'), h('span', { className: 'au-sidebar__text' }, 'Recolher menu')),
+      h('ul', { className: 'au-nav' }, navI.map(([l, d, b], i) => h('li', { key: l }, h('a', { className: 'au-nav__item', href: '#', title: l, 'aria-current': i === 1 ? 'true' : undefined, onClick: (e) => e.preventDefault() }, ic(d, 'au-nav__icon'), h('span', { className: 'au-nav__label' }, l), b ? h('span', { className: 'au-nav__badge' }, b) : null)))),
+      h('div', { className: 'au-sidebar__footer' }, h('span', { className: 'au-chip au-chip--bare', 'data-state': 'ok', style: { padding: '0 19px', height: 30 } }, h('span', { className: 'au-dot' }), h('span', { className: 'au-sidebar__text' }, 'Serviço conectado'))));
+    const xBtn = h('button', { className: 'au-modal__close', 'aria-label': 'Fechar' }, ic('M6 6l12 12M18 6L6 18'));
+    const modalDemo2 = [
+      h('div', { key: 'm', className: 'au-modal au-modal--sectioned', role: 'dialog', 'aria-label': 'Exemplo', style: { boxShadow: 'var(--au-elev-2)', maxWidth: 440 } },
+        h('header', { className: 'au-modal__header' }, h('span', { className: 'au-modal__icon' }, ic('M12 7v5l3 2M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z')), h('div', { className: 'au-modal__heading' }, h('h3', null, 'Novo agendamento'), h('p', null, 'Executado pelo serviço local')), xBtn),
+        h('div', { className: 'au-modal__body' }, h('label', { className: 'au-form-label' }, 'Nome', h('input', { className: 'au-input', placeholder: 'Ex.: Desligar estúdio' }))),
+        h('footer', { className: 'au-modal__footer' }, h('button', { className: 'au-btn' }, 'Cancelar'), h('button', { className: 'au-btn au-btn--primary' }, 'Salvar'))),
+      h('div', { key: 'a', className: 'au-modal au-modal--sectioned au-modal--alert', role: 'alertdialog', 'aria-label': 'Exemplo de alerta', style: { maxWidth: 400 } },
+        h('header', { className: 'au-modal__header' }, h('span', { className: 'au-modal__icon' }, ic('M12 4l9 16H3zM12 10v4M12 17h.01')), h('div', { className: 'au-modal__heading' }, h('h3', null, 'Gateway indisponível'), h('p', null, 'Sem resposta há 18 min')), xBtn),
+        h('footer', { className: 'au-modal__footer' }, h('button', { className: 'au-btn' }, 'Silenciar 1 h'), h('button', { className: 'au-btn au-btn--primary' }, 'Reconhecer'))),
+    ];
+    const N = (...a) => a.map(t => ({ t }));
+    const comps = [
+      { title: '3. Card de dispositivo', req: 'R01 · R03', desc: 'Nome, ambiente, tipo, conexão (direta ou via gateway), estado de comunicação, horário da última leitura e os controles disponíveis. Canais de equipamentos com várias saídas aparecem em linhas separadas, com nome editável.', demo: cardDemo,
+        code: '<article class="au-card" aria-label="…">\n  <header>…nome · ambiente · tipo · conexão</header>\n  <span class="au-chip" data-state="ok">\n    <span class="au-dot"></span>Conectado</span>\n  <div class="au-inset">\n    <div class="au-row">… canal + .au-switch</div>\n  </div>\n</article>',
+        notes: N('Use aria-label no article com o nome do equipamento.', 'Informações técnicas (IP, códigos) ficam na tela de detalhes, fora do card.', 'Equipamento sem resposta: switch com data-status="unavailable" e texto “Último valor conhecido”.') },
+      { title: '4. Chave liga/desliga', req: 'R02 · R22', desc: 'Aciona um canal de interruptor, relé ou iluminação. O atributo data-status distingue estado confirmado, comando em andamento, resultado não confirmado e equipamento indisponível. O primeiro exemplo é interativo.', demo: swDemo,
+        code: '<button class="au-switch" role="switch"\n  aria-checked="true"\n  data-status="confirmed|pending|unconfirmed|unavailable"\n  aria-label="Luz principal: ligado, confirmado">\n</button>\n<!-- variante: au-switch au-switch--sm -->',
+        notes: N('Ao clicar: aria-checked recebe o valor alvo, data-status="pending" e disabled até o retorno.', 'Sem retorno no tempo limite: data-status="unconfirmed" e chip correspondente ao lado.', 'aria-label deve incluir nome, estado e status do comando.') },
+      { title: '5. Botões', req: 'R15 · R22', desc: 'Botão padrão, principal (acento), ação sensível, indisponível, botão de energia circular e botão de ícone.', demo: btnDemo,
+        code: '<button class="au-btn">Botão</button>\n<button class="au-btn au-btn--primary">Principal</button>\n<button class="au-btn au-btn--danger">Ação sensível</button>\n<button class="au-btn au-power" aria-pressed="true"\n  aria-label="Energia">…svg</button>\n<button class="au-btn au-icon-btn" aria-label="Menu">…svg</button>',
+        notes: N('Botões só de ícone exigem aria-label.', 'au-power usa aria-pressed; o anel de acento indica ligado.', 'Ações específicas (cenas de painel, comandos IR) ficam disabled até serem mapeadas e testadas.') },
+      { title: '6. Indicadores de estado', req: 'R07 · R28', desc: 'Comunicação: conectado, sem resposta, aguardando evento, configuração pendente, erro de autenticação e desatualizado. Comando: confirmado, enviando, não confirmado e enviado sem retorno (infravermelho).', demo: chipDemo,
+        code: '<span class="au-chip" data-state="ok">\n  <span class="au-dot"></span>Conectado\n</span>\n<!-- data-state: ok | noresp | waiting | config | auth | stale\n     confirmed | pending | unconfirmed | sent\n     au-chip--bare remove o relevo -->',
+        notes: N('Cada estado tem forma própria do ponto (cheio, anel, tracejado, quadrado, losango, meio).', 'O texto sempre acompanha a cor.', 'Use aria-live="polite" na região onde o status muda.') },
+      { title: '7. Ajustes contínuos', req: 'R04 · R05 · R14', desc: 'Slider horizontal, fader vertical, knob e entrada numérica com incremento. O valor visual é controlado por custom properties (--au-value em %, --au-angle de −135deg a 135deg). Arraste o slider para ver os três reagirem.', demo: sliderDemo,
+        code: '<div class="au-slider" role="slider" tabindex="0"\n  aria-valuemin="0" aria-valuemax="100" aria-valuenow="64"\n  aria-valuetext="64%" style="--au-value:64%">\n  <div class="au-slider__fill"></div>\n  <div class="au-slider__thumb"></div>\n</div>\n<div class="au-knob" role="slider" style="--au-angle:37deg">\n  <div class="au-knob__face"></div>\n  <div class="au-knob__pointer"></div>\n</div>',
+        notes: N('Teclado: setas ± passo, PageUp/PageDown ± 10%, Home/End nos limites.', 'Envie o comando no pointerup ou 600 ms após a última tecla.', 'Valores fora dos limites do equipamento: mostre .au-error e não envie nada.') },
+      { title: '8. Seleção, busca e filtros', req: 'R09 · R10 · R13', desc: 'Grupo segmentado (modo, ventilação, abas de ambiente), campo de busca, seletor, chips de filtro, checkbox e radio.', demo: [segDemo, ...fieldDemo],
+        code: '<div class="au-seg" role="radiogroup">\n  <button class="au-seg__item" role="radio" aria-checked="true">Frio</button>\n</div>\n<div class="au-field"><input type="search"></div>\n<select class="au-select">…</select>\n<div class="au-seg au-seg--pill">\n  <button class="au-seg__item" aria-pressed="true">Com problemas</button>\n</div>',
+        notes: N('au-seg__item reconhece aria-checked, aria-selected (abas) e aria-pressed (filtros).', 'Informe a quantidade de resultados em uma região aria-live.', 'Busca deve cobrir nome, ambiente, tipo, gateway, disponibilidade e identidade técnica.') },
+      { title: '9. Leituras de sensores', req: 'R06', desc: 'Leitura atual em área com relevo interno; último valor conhecido em área tracejada com texto atenuado.', demo: sensorDemo,
+        code: '<div class="au-inset">… leitura atual</div>\n<div class="au-inset au-inset--stale">… último valor conhecido</div>',
+        notes: N('Sempre exiba o horário da leitura.', 'Use data-state="stale" no rótulo quando exceder o intervalo esperado do sensor.') },
+      { title: '10. Confirmação de acionamento', req: 'R16 · R17 · R22', desc: 'Modal para ações sensíveis, grupos e cenas. Identifica o equipamento e a função antes da execução.', demo: modalDemo,
+        code: '<div class="au-backdrop">\n  <div class="au-modal" role="dialog" aria-modal="true"\n    aria-labelledby="titulo">\n    <h3 id="titulo">Desligar grupo?</h3>\n    <div class="au-inset">Equipamento · Função</div>\n    <button class="au-btn">Cancelar</button>\n    <button class="au-btn au-btn--primary">Confirmar</button>\n  </div>\n</div>',
+        notes: N('Foco inicial no botão Cancelar; Esc fecha.', 'Cenas listam todos os dispositivos afetados antes de executar.', 'Após executar grupos e cenas, mostre o resultado por equipamento.') },
+      { title: '11. Menu lateral recolhível', req: 'R09 · R28 · R29', desc: 'Navegação principal fixa à esquerda. Expandido mostra ícone e rótulo (248 px); recolhido mostra só ícones (76 px), com o rótulo no title e no aria-label. Inclui marca, botão de recolher, itens com contador de alertas e rodapé com serviço local, tema e usuário. Clique no botão do exemplo.', demo: sideDemo,
+        code: '<nav class="au-sidebar" data-collapsed="false"\n  aria-label="Menu principal">\n  <button class="au-sidebar__toggle" aria-expanded="true"\n    aria-controls="nav">…</button>\n  <ul class="au-nav" id="nav">\n    <li><a class="au-nav__item" aria-current="true" href="#">\n      <svg class="au-nav__icon">…</svg>\n      <span class="au-nav__label">Dispositivos</span>\n      <span class="au-nav__badge">3</span></a></li>\n  </ul>\n  <div class="au-sidebar__footer">…</div>\n</nav>',
+        notes: N('Alterne data-collapsed e aria-expanded juntos; o CSS esconde rótulos e reposiciona o contador.', 'Item ativo: aria-current="true" (relevo interno + cor de acento).', 'Abaixo de 720 px o menu expandido sobrepõe o conteúdo; inicie recolhido em telas estreitas.', 'Contador de alertas deve constar no aria-label do item.') },
+      { title: '12. Janelas modais', req: 'R16 · R18 · R21 · R22', desc: 'Estrutura única com cabeçalho (ícone, título, subtítulo, fechar), corpo e rodapé de ações. Variantes: padrão, larga (au-modal--lg), alerta crítico (au-modal--alert com role="alertdialog") e painel lateral (au-drawer).', demo: modalDemo2,
+        code: '<div class="au-backdrop">\n  <div class="au-modal au-modal--sectioned" role="dialog"\n    aria-modal="true" aria-labelledby="t">\n    <header class="au-modal__header">\n      <span class="au-modal__icon">…</span>\n      <div class="au-modal__heading"><h3 id="t">Novo agendamento</h3>\n        <p>Executado pelo serviço local</p></div>\n      <button class="au-modal__close" aria-label="Fechar">×</button>\n    </header>\n    <div class="au-modal__body">…</div>\n    <footer class="au-modal__footer">…</footer>\n  </div>\n</div>\n<!-- painel lateral -->\n<div class="au-backdrop au-backdrop--drawer">\n  <aside class="au-drawer" role="dialog" aria-modal="true">…</aside>\n</div>',
+        notes: N('Fechar com Esc, botão Fechar ou clique no fundo (exceto alertas críticos que exigem decisão, se preferir).', 'Foco inicial: primeiro campo do formulário, ou ação principal no alerta.', 'Prenda o foco dentro da janela e devolva-o ao botão que a abriu ao fechar.', 'Formulários validam no envio e mostram .au-error com role="alert".') },
+    ];
+    return {
+      theme, accent, tokens, comps,
+      themeOpts: [['light', 'Claro'], ['dark', 'Escuro'], ['auto', 'Sistema']].map(([k, l]) => ({ label: l, on: String(theme === k), pick: () => this.setState({ theme: k }) })),
+      accentOpts: Object.keys(ACC).map(k => ({ label: k === 'ambar' ? 'âmbar' : k, sw: ACC[k], on: String(accent === k), pick: () => this.setState({ accent: k }) })),
+    };
+  }
+}
+</script>
+</body>
+</html>

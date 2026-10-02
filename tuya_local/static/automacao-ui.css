@@ -1,0 +1,332 @@
+/* ==========================================================================
+   Painel Automação · UI Kit · v1.0
+   Tokens (tema claro/escuro/sistema + 5 acentos) e componentes reutilizáveis.
+
+   Uso:
+     <link rel="stylesheet" href="automacao-ui.css">
+     <div class="au-root" data-au-theme="light|dark|auto" data-au-accent="ciano|verde|ambar|violeta|azul">…</div>
+
+   Os tokens são declarados no próprio elemento com data-au-theme, então
+   temas diferentes podem coexistir na mesma página.
+   ========================================================================== */
+
+/* ---------- 1. Tokens base (tema claro) ---------- */
+:root,
+[data-au-theme] {
+  --au-font: Figtree, system-ui, sans-serif;
+  --au-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --au-bg: #e4e7ec;
+  --au-shadow-dark: #c2c7d0;
+  --au-shadow-light: #ffffff;
+  --au-shadow-deep: #aab0bb;
+  --au-knob-hi: #eef0f3;
+  --au-knob-lo: #d9dde3;
+  --au-thumb: #eceef2;
+
+  --au-text: #3b4250;
+  --au-text-strong: #2f3542;
+  --au-text-soft: #5a606b;
+  --au-icon: #4a505c;
+  --au-muted: #5d6472;
+  --au-faint: #7b8291;
+  --au-rule: #a9afb9;
+  --au-divider: #d3d7de;
+  --au-track: #cfd3da;
+  --au-dashed: #b6bcc6;
+  --au-tick: #9aa1ad;
+
+  --au-ok: #2a9d6a;      --au-ok-ink: #1f7a52;
+  --au-err: #d0443c;     --au-err-ink: #b2362f;   --au-on-err: #ffffff;
+  --au-warn: #d9901a;    --au-warn-ink: #8a5a07;   --au-warn-wash: #f1d9a6;
+  --au-info: #4d74a3;    --au-info-ink: #3d5f86;
+  --au-stale: #6b7280;
+  --au-star: #c98a0e;
+
+  --au-backdrop: rgba(58, 64, 75, .35);
+  --au-modal-shadow: 12px 12px 30px rgba(80, 88, 104, .35), -6px -6px 18px rgba(255, 255, 255, .6);
+
+  /* Acento padrão: ciano */
+  --au-accent: #1fb6e0;
+  --au-accent-hi: #3ccaf2;
+  --au-accent-lo: #18a9d4;
+  --au-accent-soft: #7fdcf6;
+  --au-accent-ring: #5fd6f7;
+  --au-accent-strong: #1592b5;
+  --au-accent-ink-light: #0f6a8f;
+  --au-accent-ink-darkmode: #6fd3f2;
+  --au-accent-ink-hover: #0a4e6a;
+  --au-on-accent: #05313f;
+  --au-accent-wash: rgba(31, 182, 224, .12);
+  --au-accent-ink: var(--au-accent-ink-light);
+
+  /* Relevo (composições recalculadas por tema) */
+  --au-elev-1: 3px 3px 7px var(--au-shadow-dark), -3px -3px 7px var(--au-shadow-light);
+  --au-elev-2: 8px 8px 18px var(--au-shadow-dark), -8px -8px 18px var(--au-shadow-light);
+  --au-inset-sm: inset 2px 2px 4px var(--au-shadow-dark), inset -2px -2px 4px var(--au-shadow-light);
+  --au-inset: inset 3px 3px 6px var(--au-shadow-dark), inset -3px -3px 6px var(--au-shadow-light);
+
+  --au-radius-sm: 10px;
+  --au-radius: 12px;
+  --au-radius-md: 16px;
+  --au-radius-lg: 22px;
+}
+
+/* ---------- 2. Tema escuro ---------- */
+[data-au-theme="dark"] {
+  --au-bg: #262a31;
+  --au-shadow-dark: #1a1d22;
+  --au-shadow-light: #323740;
+  --au-shadow-deep: #15181c;
+  --au-knob-hi: #30353d;
+  --au-knob-lo: #22262c;
+  --au-thumb: #343941;
+  --au-text: #d5d9e0;
+  --au-text-strong: #eef0f4;
+  --au-text-soft: #b9bfc9;
+  --au-icon: #c3c8d1;
+  --au-muted: #9aa2af;
+  --au-faint: #7d8592;
+  --au-rule: #4a505a;
+  --au-divider: #353a42;
+  --au-track: #3a3f48;
+  --au-dashed: #4b515c;
+  --au-tick: #6b7280;
+  --au-ok: #3fbf83;   --au-ok-ink: #5ed39a;
+  --au-err: #f0645b;  --au-err-ink: #ff8a82; --au-on-err: #2a0b09;
+  --au-warn: #e9a53a; --au-warn-ink: #f2bd62; --au-warn-wash: #5a4520;
+  --au-info: #6f97c8; --au-info-ink: #93b5de;
+  --au-stale: #8b93a0;
+  --au-star: #e6ac35;
+  --au-backdrop: rgba(8, 10, 14, .55);
+  --au-modal-shadow: 12px 12px 30px rgba(0, 0, 0, .5), -6px -6px 18px rgba(255, 255, 255, .04);
+  --au-accent-ink: var(--au-accent-ink-darkmode);
+  --au-accent-ink-hover: var(--au-accent-soft);
+}
+@media (prefers-color-scheme: dark) {
+  [data-au-theme="auto"] {
+    --au-bg: #262a31;
+    --au-shadow-dark: #1a1d22;
+    --au-shadow-light: #323740;
+    --au-shadow-deep: #15181c;
+    --au-knob-hi: #30353d;
+    --au-knob-lo: #22262c;
+    --au-thumb: #343941;
+    --au-text: #d5d9e0;
+    --au-text-strong: #eef0f4;
+    --au-text-soft: #b9bfc9;
+    --au-icon: #c3c8d1;
+    --au-muted: #9aa2af;
+    --au-faint: #7d8592;
+    --au-rule: #4a505a;
+    --au-divider: #353a42;
+    --au-track: #3a3f48;
+    --au-dashed: #4b515c;
+    --au-tick: #6b7280;
+    --au-ok: #3fbf83;   --au-ok-ink: #5ed39a;
+    --au-err: #f0645b;  --au-err-ink: #ff8a82; --au-on-err: #2a0b09;
+    --au-warn: #e9a53a; --au-warn-ink: #f2bd62; --au-warn-wash: #5a4520;
+    --au-info: #6f97c8; --au-info-ink: #93b5de;
+    --au-stale: #8b93a0;
+    --au-star: #e6ac35;
+    --au-backdrop: rgba(8, 10, 14, .55);
+    --au-modal-shadow: 12px 12px 30px rgba(0, 0, 0, .5), -6px -6px 18px rgba(255, 255, 255, .04);
+    --au-accent-ink: var(--au-accent-ink-darkmode);
+    --au-accent-ink-hover: var(--au-accent-soft);
+  }
+}
+
+/* ---------- 3. Acentos ---------- */
+[data-au-accent="verde"] {
+  --au-accent: #22b07d; --au-accent-hi: #3fcf98; --au-accent-lo: #1a9a6c; --au-accent-soft: #8be3c1;
+  --au-accent-ring: #5fdcae; --au-accent-strong: #178a60; --au-accent-ink-light: #0e6b49;
+  --au-accent-ink-darkmode: #6fe0b4; --au-on-accent: #04301f; --au-accent-wash: rgba(34, 176, 125, .12);
+}
+[data-au-accent="ambar"] {
+  --au-accent: #e8a21f; --au-accent-hi: #f5bb48; --au-accent-lo: #d68f12; --au-accent-soft: #f6d48e;
+  --au-accent-ring: #f3c463; --au-accent-strong: #b77a0c; --au-accent-ink-light: #7f5206;
+  --au-accent-ink-darkmode: #f5c66a; --au-on-accent: #3a2503; --au-accent-wash: rgba(232, 162, 31, .14);
+}
+[data-au-accent="violeta"] {
+  --au-accent: #8a6cf0; --au-accent-hi: #a28af5; --au-accent-lo: #7556e6; --au-accent-soft: #c6b8fa;
+  --au-accent-ring: #ae98f7; --au-accent-strong: #6a4fd6; --au-accent-ink-light: #5137b8;
+  --au-accent-ink-darkmode: #b9a6fb; --au-on-accent: #1d1150; --au-accent-wash: rgba(138, 108, 240, .12);
+}
+[data-au-accent="azul"] {
+  --au-accent: #3b82f6; --au-accent-hi: #5c9bf8; --au-accent-lo: #2f6fe0; --au-accent-soft: #a4c6fb;
+  --au-accent-ring: #7fb0f9; --au-accent-strong: #2563c9; --au-accent-ink-light: #1d4fa8;
+  --au-accent-ink-darkmode: #8db8fa; --au-on-accent: #061a3d; --au-accent-wash: rgba(59, 130, 246, .12);
+}
+
+/* ---------- 4. Base ---------- */
+body:has(> * [data-au-theme="dark"]), body:has([data-au-theme="dark"]) { background: #262a31; }
+.au-root { background: var(--au-bg); color: var(--au-text); font-family: var(--au-font); -webkit-font-smoothing: antialiased; }
+.au-root a { color: var(--au-accent-ink); }
+.au-root a:hover { color: var(--au-accent-ink-hover); }
+.au-root :focus-visible { outline: 2px solid var(--au-accent-strong); outline-offset: 3px; }
+@keyframes au-spin { to { transform: rotate(360deg); } }
+@keyframes dcspin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .au-root * { transition: none !important; animation-duration: 0s !important; } }
+
+/* ---------- 5. Superfícies ---------- */
+.au-card { background: var(--au-bg); border-radius: var(--au-radius-lg); padding: 22px; box-shadow: var(--au-elev-2); display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.au-inset { border-radius: var(--au-radius-md); box-shadow: var(--au-inset); padding: 14px 16px; }
+.au-inset--stale { box-shadow: none; border: 1.5px dashed var(--au-dashed); }   /* último valor conhecido */
+.au-label { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--au-muted); font-weight: 600; }
+.au-tag { font: 600 11px var(--au-mono); color: var(--au-accent-ink); padding: 3px 8px; border-radius: 999px; box-shadow: var(--au-inset-sm); }
+.au-meta { font-size: 13px; color: var(--au-muted); }
+.au-mono { font-family: var(--au-mono); }
+
+/* ---------- 6. Botões ---------- */
+.au-btn { appearance: none; border: none; background: var(--au-bg); border-radius: var(--au-radius); padding: 10px 18px; box-shadow: var(--au-elev-1); font: 600 14px/1.2 var(--au-font); color: var(--au-text); cursor: pointer; transition: box-shadow .15s; }
+.au-btn:active { box-shadow: var(--au-inset-sm); }
+.au-btn--primary { background: linear-gradient(180deg, var(--au-accent-hi), var(--au-accent-lo)); color: var(--au-on-accent); font-weight: 700; }
+.au-btn--danger { color: var(--au-err-ink); }
+.au-btn--sm { padding: 7px 12px; font-size: 12.5px; border-radius: var(--au-radius-sm); }
+.au-btn--link { box-shadow: none; background: transparent; padding: 2px 4px; color: var(--au-accent-ink); text-decoration: underline; }
+.au-btn:disabled { box-shadow: var(--au-inset-sm); background: var(--au-bg); color: var(--au-faint); cursor: not-allowed; }
+.au-icon-btn { width: 48px; height: 48px; padding: 0; border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; color: var(--au-icon); }
+.au-power { width: 64px; height: 64px; padding: 0; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: var(--au-text-soft); }
+.au-power[aria-pressed="true"] { color: var(--au-accent-strong); box-shadow: var(--au-elev-1), 0 0 0 3px var(--au-bg), 0 0 0 5px var(--au-accent-ring); }
+
+/* ---------- 7. Chave liga/desliga ----------
+   <button class="au-switch" role="switch" aria-checked="true" data-status="confirmed|pending|unconfirmed|unavailable"> */
+.au-switch { position: relative; width: 76px; height: 36px; flex: none; border: none; padding: 0; border-radius: 18px; background: var(--au-bg); box-shadow: var(--au-inset); cursor: pointer; transition: background .2s; }
+.au-switch::after { content: ""; position: absolute; top: 4px; left: 4px; width: 28px; height: 28px; border-radius: 50%; background: var(--au-thumb); box-shadow: 2px 2px 5px var(--au-shadow-deep), -1px -1px 3px var(--au-shadow-light); transition: left .22s; }
+.au-switch[aria-checked="true"] { background: linear-gradient(90deg, var(--au-accent-soft), var(--au-accent)); }
+.au-switch[aria-checked="true"]::after { left: 44px; }
+.au-switch[data-status="pending"] { background: repeating-linear-gradient(135deg, var(--au-warn-wash) 0 6px, var(--au-bg) 6px 12px); cursor: progress; }
+.au-switch[data-status="unconfirmed"] { box-shadow: var(--au-inset), 0 0 0 2px var(--au-err); }
+.au-switch[data-status="unavailable"] { box-shadow: none; border: 2px dashed var(--au-dashed); background: var(--au-bg); cursor: not-allowed; }
+.au-switch[data-status="unavailable"]::after { top: 2px; background: var(--au-bg); border: 1.5px solid var(--au-dashed); box-shadow: none; box-sizing: border-box; }
+.au-switch--sm { width: 62px; height: 32px; border-radius: 16px; }
+.au-switch--sm::after { width: 24px; height: 24px; }
+.au-switch--sm[aria-checked="true"]::after { left: 34px; }
+
+/* ---------- 8. Indicadores de estado ----------
+   <span class="au-chip" data-state="ok"><span class="au-dot"></span>Conectado</span> */
+.au-chip { display: inline-flex; align-items: center; gap: 7px; padding: 5px 11px; border-radius: 999px; box-shadow: var(--au-inset-sm); font: 600 12.5px var(--au-font); color: var(--au-muted); }
+.au-chip--bare { box-shadow: none; padding: 0; }
+.au-dot { width: 10px; height: 10px; flex: none; box-sizing: border-box; display: inline-block; border-radius: 50%; }
+[data-state="ok"], [data-state="confirmed"] { color: var(--au-ok-ink); }
+[data-state="ok"] .au-dot, [data-state="confirmed"] .au-dot { background: var(--au-ok); }
+[data-state="noresp"], [data-state="unconfirmed"], [data-state="auth"] { color: var(--au-err-ink); }
+[data-state="noresp"] .au-dot, [data-state="unconfirmed"] .au-dot { border: 2px solid var(--au-err); }
+[data-state="auth"] .au-dot { width: 9px; height: 9px; border-radius: 1px; background: var(--au-err); transform: rotate(45deg); }
+[data-state="waiting"], [data-state="sent"] { color: var(--au-info-ink); }
+[data-state="waiting"] .au-dot, [data-state="sent"] .au-dot { border: 2px dashed var(--au-info); }
+[data-state="config"] { color: var(--au-warn-ink); }
+[data-state="config"] .au-dot { border-radius: 2px; background: var(--au-warn); }
+[data-state="pending"] { color: var(--au-warn-ink); }
+[data-state="pending"] .au-dot { border: 2px solid var(--au-warn); border-top-color: transparent; animation: au-spin .8s linear infinite; }
+[data-state="stale"] { color: var(--au-muted); }
+[data-state="stale"] .au-dot { border: 1.5px solid var(--au-stale); background: linear-gradient(90deg, var(--au-stale) 50%, transparent 50%); }
+
+/* ---------- 9. Segmentado / abas / chips de filtro ---------- */
+.au-seg { display: flex; gap: 8px; flex-wrap: wrap; }
+.au-seg__item { appearance: none; border: none; background: var(--au-bg); border-radius: var(--au-radius); padding: 9px 13px; box-shadow: var(--au-elev-1); font: 600 13px var(--au-font); color: var(--au-text); cursor: pointer; }
+.au-seg__item[aria-checked="true"], .au-seg__item[aria-selected="true"], .au-seg__item[aria-pressed="true"] { box-shadow: var(--au-inset); color: var(--au-accent-ink); font-weight: 700; }
+.au-seg__item:disabled { color: var(--au-faint); cursor: not-allowed; }
+.au-seg--pill .au-seg__item { border-radius: 999px; padding: 7px 14px; }
+
+/* ---------- 10. Campos ---------- */
+.au-field { display: flex; align-items: center; gap: 8px; padding: 0 14px; height: 42px; border-radius: 21px; box-shadow: var(--au-inset); }
+.au-field input { flex: 1; min-width: 0; border: none; background: transparent; font: 500 14px var(--au-font); color: var(--au-text-strong); outline: none; }
+.au-select { appearance: none; border: none; background: var(--au-bg); border-radius: var(--au-radius); padding: 9px 14px; box-shadow: var(--au-elev-1); font: 600 13px var(--au-font); color: var(--au-text); cursor: pointer; }
+.au-checkbox, .au-radio { width: 26px; height: 26px; padding: 0; border: none; border-radius: 8px; background: var(--au-bg); box-shadow: var(--au-inset-sm); color: var(--au-accent-ink); font: 800 15px var(--au-font); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+.au-radio { width: 24px; height: 24px; border-radius: 50%; }
+.au-radio[aria-checked="true"]::after { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--au-accent); }
+.au-checkbox[aria-checked="true"]::after { content: "✓"; }
+
+/* Stepper numérico: <div class="au-stepper"><input><span>°C</span><div class="au-stepper__btns"><button>▲</button><button>▼</button></div></div> */
+.au-stepper { display: inline-flex; align-items: center; gap: 4px; padding: 4px 4px 4px 14px; border-radius: 14px; box-shadow: var(--au-inset); }
+.au-stepper input { width: 64px; border: none; background: transparent; font: 600 16px var(--au-mono); color: var(--au-text-strong); outline: none; }
+.au-stepper__btns { display: flex; flex-direction: column; gap: 3px; }
+.au-stepper__btns button { width: 32px; height: 20px; padding: 0; border: none; border-radius: 7px; background: var(--au-bg); box-shadow: 2px 2px 4px var(--au-shadow-dark), -2px -2px 4px var(--au-shadow-light); font: 700 11px var(--au-font); color: var(--au-text); cursor: pointer; }
+.au-error { margin: 0; font-size: 13px; font-weight: 600; color: var(--au-err-ink); }
+
+/* ---------- 11. Slider horizontal / fader vertical ----------
+   Valor via custom property: style="--au-value:64%" */
+.au-slider { position: relative; height: 28px; cursor: pointer; touch-action: none; border-radius: 14px; }
+.au-slider::before { content: ""; position: absolute; left: 0; right: 0; top: 9px; height: 10px; border-radius: 5px; box-shadow: var(--au-inset-sm); }
+.au-slider__fill { position: absolute; left: 0; top: 9px; height: 10px; border-radius: 5px; width: var(--au-value, 0%); background: linear-gradient(90deg, var(--au-accent-soft), var(--au-accent)); }
+.au-slider__thumb { position: absolute; top: 2px; left: calc(var(--au-value, 0%) - 12px); width: 24px; height: 24px; border-radius: 50%; background: var(--au-thumb); box-shadow: 2px 2px 5px var(--au-shadow-deep), -2px -2px 5px var(--au-shadow-light); }
+.au-fader { position: relative; width: 44px; height: 200px; cursor: pointer; touch-action: none; }
+.au-fader::before { content: ""; position: absolute; top: 0; bottom: 0; left: 18px; width: 8px; border-radius: 4px; box-shadow: var(--au-inset-sm); }
+.au-fader__fill { position: absolute; bottom: 0; left: 18px; width: 8px; border-radius: 4px; height: var(--au-value, 0%); background: linear-gradient(0deg, var(--au-accent), var(--au-accent-soft)); }
+.au-fader__thumb { position: absolute; left: 4px; bottom: calc(var(--au-value, 0%) - 10px); width: 36px; height: 20px; border-radius: 7px; background: linear-gradient(180deg, var(--au-knob-hi), var(--au-knob-lo)); box-shadow: 2px 3px 6px var(--au-shadow-deep), -2px -2px 4px var(--au-shadow-light); }
+
+/* ---------- 12. Knob ----------
+   style="--au-angle:37deg" (−135deg a 135deg) */
+.au-knob { position: relative; width: 160px; height: 160px; border-radius: 50%; cursor: grab; touch-action: none; }
+.au-knob__face { position: absolute; inset: 26px; border-radius: 50%; background: linear-gradient(145deg, var(--au-knob-hi), var(--au-knob-lo)); box-shadow: 6px 6px 14px var(--au-shadow-deep), -6px -6px 14px var(--au-shadow-light); }
+.au-knob__pointer { position: absolute; inset: 26px; transform: rotate(var(--au-angle, -135deg)); }
+.au-knob__pointer::after { content: ""; position: absolute; top: 12px; left: 50%; margin-left: -4px; width: 8px; height: 8px; border-radius: 50%; background: var(--au-accent); }
+.au-knob__arc-track { stroke: var(--au-track); }
+.au-knob__arc-value { stroke: var(--au-accent); }
+
+/* ---------- 13. Listas, tabelas, modal ---------- */
+.au-row { display: flex; align-items: center; gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--au-divider); }
+.au-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.au-table th { text-align: left; color: var(--au-muted); font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; font-weight: 600; padding: 10px 8px; }
+.au-table td { padding: 9px 8px; border-top: 1px solid var(--au-divider); }
+.au-backdrop { position: fixed; inset: 0; background: var(--au-backdrop); display: flex; align-items: center; justify-content: center; padding: 20px; z-index: 50; }
+.au-modal { width: min(460px, 100%); background: var(--au-bg); border-radius: 24px; padding: 26px; box-shadow: var(--au-modal-shadow); display: flex; flex-direction: column; gap: 16px; }
+
+/* ---------- 14. Menu lateral recolhível ----------
+   <nav class="au-sidebar" data-collapsed="false" aria-label="Menu principal">
+     <div class="au-sidebar__brand">…</div>
+     <button class="au-sidebar__toggle" aria-expanded="true" aria-controls="nav">…</button>
+     <ul class="au-nav" id="nav"><li><a class="au-nav__item" aria-current="true">
+       <svg class="au-nav__icon">…</svg><span class="au-nav__label">Dispositivos</span>
+       <span class="au-nav__badge">3</span></a></li></ul>
+     <div class="au-sidebar__footer">…</div>
+   </nav> */
+.au-shell { display: flex; align-items: flex-start; min-height: 100vh; }
+.au-shell__main { flex: 1; min-width: 0; padding: 36px 28px 80px; box-sizing: border-box; }
+.au-sidebar { position: sticky; top: 0; height: 100vh; width: 248px; flex: none; box-sizing: border-box; padding: 18px 12px; display: flex; flex-direction: column; gap: 16px; background: var(--au-bg); box-shadow: 6px 0 16px var(--au-shadow-dark); overflow: hidden; transition: width .25s ease; z-index: 20; }
+.au-sidebar[data-collapsed="true"] { width: 76px; }
+.au-sidebar__brand { display: flex; align-items: center; gap: 12px; min-height: 48px; padding-left: 4px; white-space: nowrap; }
+.au-sidebar__mark { width: 44px; height: 44px; flex: none; border-radius: 14px; box-shadow: var(--au-elev-1); display: flex; align-items: center; justify-content: center; font: 800 15px var(--au-font); color: var(--au-accent-ink); }
+.au-sidebar__toggle { appearance: none; border: none; background: var(--au-bg); border-radius: var(--au-radius); height: 40px; padding: 0 15px; box-shadow: var(--au-elev-1); display: flex; align-items: center; gap: 10px; font: 600 13px var(--au-font); color: var(--au-text); cursor: pointer; white-space: nowrap; }
+.au-sidebar__toggle svg { flex: none; transition: transform .25s; }
+.au-sidebar[data-collapsed="true"] .au-sidebar__toggle svg { transform: rotate(180deg); }
+.au-sidebar__footer { display: flex; flex-direction: column; gap: 8px; padding-top: 12px; border-top: 1px solid var(--au-divider); }
+.au-nav { list-style: none; margin: 0; padding: 4px 2px; display: flex; flex-direction: column; gap: 6px; flex: 1; overflow-y: auto; overflow-x: hidden; }
+.au-nav__item { position: relative; display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 14px; border-radius: var(--au-radius); text-decoration: none; color: var(--au-text); font: 600 14px var(--au-font); white-space: nowrap; }
+.au-root .au-nav__item { color: var(--au-text); }
+.au-nav__item:hover { color: var(--au-text-strong); }
+.au-root .au-nav__item[aria-current="true"], .au-root .au-nav__item[aria-current="page"] { box-shadow: var(--au-inset); color: var(--au-accent-ink); font-weight: 700; }
+.au-nav__icon { width: 20px; height: 20px; flex: none; }
+.au-nav__label { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+.au-nav__badge { min-width: 20px; height: 20px; padding: 0 6px; box-sizing: border-box; border-radius: 10px; background: var(--au-err); color: var(--au-on-err); font: 700 11px var(--au-font); display: inline-flex; align-items: center; justify-content: center; }
+.au-sidebar[data-collapsed="true"] .au-nav__label,
+.au-sidebar[data-collapsed="true"] .au-sidebar__text { display: none; }
+.au-sidebar[data-collapsed="true"] .au-nav__badge { position: absolute; top: 6px; left: 30px; min-width: 16px; height: 16px; font-size: 10px; padding: 0 4px; }
+@media (max-width: 720px) { .au-sidebar:not([data-collapsed="true"]) { position: fixed; left: 0; box-shadow: 10px 0 30px var(--au-shadow-dark); } }
+
+/* ---------- 15. Janelas modais (cabeçalho / corpo / rodapé) ----------
+   <div class="au-backdrop"><div class="au-modal au-modal--sectioned" role="dialog" aria-modal="true" aria-labelledby="t">
+     <header class="au-modal__header"><span class="au-modal__icon">…</span>
+       <div class="au-modal__heading"><h3 id="t">Título</h3><p>Subtítulo</p></div>
+       <button class="au-modal__close" aria-label="Fechar">×</button></header>
+     <div class="au-modal__body">…</div>
+     <footer class="au-modal__footer">…</footer></div></div>
+   Variantes: au-modal--lg (600px), au-modal--alert (role="alertdialog"), au-drawer (painel lateral). */
+.au-modal--sectioned { padding: 0; gap: 0; max-height: calc(100vh - 40px); overflow: auto; }
+.au-modal--lg { width: min(600px, 100%); }
+.au-modal--alert { box-shadow: var(--au-modal-shadow), 0 0 0 2px var(--au-err); }
+.au-modal__header { display: flex; align-items: flex-start; gap: 14px; padding: 22px 24px 16px; }
+.au-modal__icon { width: 44px; height: 44px; flex: none; border-radius: 14px; box-shadow: var(--au-inset-sm); display: flex; align-items: center; justify-content: center; color: var(--au-accent-ink); }
+.au-modal--alert .au-modal__icon { color: var(--au-err-ink); }
+.au-modal__heading { flex: 1; display: flex; flex-direction: column; gap: 3px; }
+.au-modal__heading h3 { margin: 0; font-size: 19px; font-weight: 700; color: var(--au-text-strong); }
+.au-modal__heading p { margin: 0; font-size: 13px; color: var(--au-muted); }
+.au-modal__close { width: 36px; height: 36px; flex: none; padding: 0; border: none; border-radius: 11px; background: var(--au-bg); box-shadow: var(--au-elev-1); color: var(--au-text); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.au-modal__body { padding: 4px 24px 20px; display: flex; flex-direction: column; gap: 16px; }
+.au-modal__footer { display: flex; justify-content: flex-end; align-items: center; gap: 10px; flex-wrap: wrap; padding: 16px 24px 22px; border-top: 1px solid var(--au-divider); }
+.au-backdrop--drawer { justify-content: flex-end; padding: 0; }
+.au-drawer { width: min(420px, 100%); height: 100%; box-sizing: border-box; background: var(--au-bg); box-shadow: -10px 0 30px var(--au-shadow-dark); border-radius: 24px 0 0 24px; display: flex; flex-direction: column; overflow: auto; }
+.au-drawer .au-modal__body { flex: 1; }
+.au-input { height: 42px; box-sizing: border-box; border: none; border-radius: 14px; padding: 0 14px; box-shadow: var(--au-inset); background: var(--au-bg); font: 500 14px var(--au-font); color: var(--au-text-strong); outline: none; }
+.au-form-label { display: flex; flex-direction: column; gap: 7px; font-size: 13px; font-weight: 600; }
